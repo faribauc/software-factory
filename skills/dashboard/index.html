@@ -61,8 +61,8 @@
   .s-new { background: var(--s-new); } .s-needs-info { background: var(--warning); } .s-rejected { background: var(--s-rejected); }
   .s-accepted { background: var(--s-accepted); } .s-building { background: var(--s-building); }
   .s-in-review { background: var(--s-in-review); } .s-needs-human { background: var(--critical); } .s-done { background: var(--good); }
-  .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; border-radius: 8px; overflow: hidden; }
-  @media (min-width: 1000px) { .flow { grid-template-columns: repeat(8, 1fr); } }
+  .flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; border-radius: 8px; overflow: hidden; }
+  @media (min-width: 1000px) { .flow { grid-template-columns: repeat(8, minmax(0, 1fr)); } }
   .flow > div { background: var(--page); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
   .flow b { font-size: 22px; font-weight: 600; }
   .flow .zero b { color: var(--muted); font-weight: 400; }
