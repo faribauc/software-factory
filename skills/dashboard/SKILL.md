@@ -29,10 +29,12 @@ open it in the preview only if the user asks to see it there.
 
 ## What it shows
 
-The overview (`/`) has stats across all projects, then a card per project.
-Click a project's name to open its view (`/#<project id>`): every issue by
-stage, all threads including finished ones, open PRs, and the project's stats
-with a 14-day chart of runs per day.
+The overview (`/`) leads with what's waiting on the user, then totals across
+all projects, issues per stage, a 14-day chart of runs per day, a ranked list of
+what needs attention, and a table of projects. Click a project's row to open its
+view (`/#<project id>`): its stats, a board of issues by stage, runs per day and
+per provider, open PRs, and all threads including finished ones. Every chart has
+a table view.
 
 Issue stages, from GitHub. The first rule that matches wins:
 
@@ -66,8 +68,8 @@ Thread states, worked out from T3's records:
 | ready | the last run finished and the thread isn't settled yet |
 | done | settled; hidden on the overview, listed in the project view |
 
-PR chips: check status (`success`, `failure`, `pending`, `no checks`), `draft`,
-`approved`, `changes`, `conflict`. GitHub results are cached for two minutes,
+PR status: checks (`passing`, `failing`, `pending`, `no checks`), `draft`,
+`approved`, `changes requested`, `conflict`. GitHub results are cached for two minutes,
 one GraphQL call per repository.
 
 ## When it breaks
