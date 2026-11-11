@@ -26,12 +26,27 @@ small while you answer it.
 
 ## 2. Seat the council
 
-Pick three members, each the latest flagship model of its provider, at high
-reasoning effort. Use as many different providers as are available. When fewer
-than three are, fill the remaining seats with another flagship model from an
-available provider, and name every substitution in the report. If the user
-named members, use exactly those. If one is unavailable, say so and don't
-replace it silently.
+Three seats, one per provider, each at high reasoning effort:
+
+| Seat | Default model | Leads on |
+| --- | --- | --- |
+| A | OpenAI's flagship: GPT-6.1 Sol (Codex) | correctness and scope, in depth |
+| B | Muse's flagship: Muse Wonder 1.0 | security when the change touches it, otherwise ux and ui |
+| C | Claude's flagship that isn't the builder's model: Claude Fable 5.2, or Claude Opus 5.5 when Fable built the change | ux and ui when the change touches `ui`, otherwise security |
+
+- **Never seat the builder's model.** A model reviewing its own work is not an
+  independent reviewer.
+- **One seat per provider.** If a provider is unavailable, fill its seat with a
+  second model from another provider, never the builder's, and name the
+  substitution in the report.
+- **Newer models replace the defaults.** When a provider ships a newer flagship,
+  use it and update this table.
+- **The user's choice wins.** If the user named members, use exactly those. If
+  one is unavailable, say so and don't replace it silently.
+- **Every seat reviews correctness and scope.** The lead lens is where it goes
+  deepest, not the only thing it reports.
+
+To start them:
 
 - **In T3 Code:** call `orchestrator_capabilities` to resolve models, then
   start one `delegate_task` per member in the same turn: `role: "review"`,
@@ -55,6 +70,7 @@ Read the surrounding code, not just the diff. Look for bugs, broken callers, and
 mismatches with the intent and the spec's acceptance criteria. Hold the change to
 its intent: flag code, tests, options or guards the intent doesn't need.
 <lens checklists for this change's surfaces, from below>
+You lead on <this seat's lens>: go deepest there, and still report anything else you find.
 
 Severity: blocker = the intended case is wrong. should = a real bug callers will
 hit, within the intent. nit = everything else (other paths, rare cases, small
@@ -69,8 +85,9 @@ Give stable ids per member (`A1`, `B1`, `C1`) so later rounds can refer to them.
 
 ### Lenses
 
-Every member gets **correctness and scope**. Add the lenses the change's
-surfaces call for (the spec header has them; otherwise judge from the diff):
+Every member gets **correctness and scope**, plus the lenses the change's
+surfaces call for (the spec header has them; otherwise judge from the diff).
+Each seat's brief also names the lens it leads, from the seat table:
 
 - **security**: who can call each new or changed path, and whether they own
   what they touch; input reaching SQL, shells, file paths, templates or HTML
@@ -118,9 +135,10 @@ change, cut it back before the next round. Don't agree just to end the loop.
 
 ## 6. Report
 
-Lead with the outcome: approved, or stuck and why. Then rounds, members (with
-any substitutions), scores per round, what changed because of the council, the
-diff size before and after, and the declined findings with reasons.
+Lead with the outcome: approved, or stuck and why. Then rounds, members with
+their seat and lead lens (and any substitutions), scores per round, what changed
+because of the council, the diff size before and after, and the declined
+findings with reasons.
 
 If a PR exists, put the table in its description (edit it; don't comment),
 just above the model credit line:
