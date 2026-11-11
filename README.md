@@ -20,6 +20,10 @@ imported from `~/.claude/CLAUDE.md`, and `~/.codex/AGENTS.md` links to it.
 Anything a link replaces moves to `~/.agents/skills-backup/<timestamp>/`. Run
 it again after adding a skill.
 
+T3 Code caches each provider's commands. After installing, or adding or
+renaming a skill, refresh the providers in T3's settings (or restart T3) before
+the new commands show up in its `/` menu.
+
 ## The flow
 
 ```
