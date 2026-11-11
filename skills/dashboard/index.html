@@ -5,69 +5,127 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Factory</title>
 <style>
-  :root { color-scheme: light dark; --bg: #f6f6f4; --card: #fff; --ink: #1d1d1b; --muted: #6b6b66; --line: #e3e3de;
-          --red: #b42318; --amber: #b54708; --blue: #175cd3; --green: #067647; }
+  :root {
+    color-scheme: light dark;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+    --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11, 11, 11, .10); --hover: rgba(11, 11, 11, .04);
+    --accent: #2a78d6; --prev: #c3c2b7;
+    --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100;
+    --good: #0ca30c; --warning: #fab219; --serious: #ec835a; --critical: #d03b3b;
+    --s-new: #c3c2b7; --s-rejected: #898781; --s-accepted: #86b6ef; --s-building: #2a78d6; --s-in-review: #184f95;
+  }
   @media (prefers-color-scheme: dark) {
-    :root { --bg: #141413; --card: #1e1e1c; --ink: #ececea; --muted: #a0a09a; --line: #33332f;
-            --red: #f97066; --amber: #fdb022; --blue: #84adff; --green: #47cd89; }
+    :root {
+      --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
+      --grid: #2c2c2a; --axis: #383835; --ring: rgba(255, 255, 255, .10); --hover: rgba(255, 255, 255, .05);
+      --accent: #3987e5; --prev: #4a4945;
+      --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500;
+      --s-new: #52514e; --s-accepted: #184f95; --s-in-review: #6da7ec;
+    }
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, sans-serif; }
-  header { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: baseline; padding: 20px 24px 8px; }
-  h1 { font-size: 18px; margin: 0; }
-  .stamp { margin-left: auto; color: var(--muted); font-size: 12px; }
-  main { padding: 12px 24px 32px; }
-  main:not(.detail) { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
-  section.project { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; min-width: 0; }
-  section.project.quiet { opacity: .6; }
-  h2 { font-size: 15px; margin: 0; }
-  .repo { color: var(--muted); font-size: 12px; text-decoration: none; }
-  .repo:hover { text-decoration: underline; }
-  h3 { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 14px 0 4px; font-weight: 600; }
-  ul { list-style: none; margin: 0; padding: 0; }
-  li { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; padding: 3px 0; min-width: 0; }
-  li .t { flex: 1 1 12em; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  li .meta { color: var(--muted); font-size: 12px; white-space: nowrap; }
-  a { color: inherit; }
-  .chip { font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 99px; border: 1px solid currentColor; white-space: nowrap; }
-  .needs-you, .failure, .error, .changes_requested, .conflicting { color: var(--red); }
-  .failed, .pending, .expected, .ready, .draft { color: var(--amber); }
-  .running { color: var(--blue); }
-  .success, .approved, .done { color: var(--green); }
-  .building, .in-review { color: var(--blue); }
-  .needs-info { color: var(--amber); }
-  .needs-human { color: var(--red); }
-  .none, .label, .new, .rejected { color: var(--muted); }
-  .accepted { color: var(--ink); }
-  .err { color: var(--red); font-size: 12px; margin-top: 8px; }
-  h1 a, h2 a { text-decoration: none; }
-  h2 a:hover, .back:hover { text-decoration: underline; }
-  .stages { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
-  .tiles { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 24px 0; }
-  .tile { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; min-width: 120px; }
-  .tile b { display: block; font-size: 18px; }
-  .tile > span { color: var(--muted); font-size: 12px; }
-  .tile .chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
-  main.detail { max-width: 980px; }
-  .back { color: var(--muted); font-size: 13px; }
-  .detail section.project { margin-top: 12px; }
-  .detail .tiles { padding: 0; margin-top: 12px; }
-  .chart { display: flex; align-items: flex-end; gap: 3px; height: 72px; margin-top: 8px; }
-  .chart div { flex: 1; background: var(--blue); border-radius: 2px 2px 0 0; min-height: 1px; opacity: .8; }
-  .axis { display: flex; justify-content: space-between; color: var(--muted); font-size: 11px; }
-  .empty { color: var(--muted); font-size: 12px; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  a { color: inherit; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 1320px; margin: 0 auto; padding: 20px 24px 40px; }
+  header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-bottom: 16px; }
+  h1 { font-size: 20px; margin: 0; font-weight: 650; }
+  .crumb { font-size: 20px; font-weight: 650; }
+  .crumb a { color: var(--muted); font-weight: 500; }
+  .crumb .sep { color: var(--muted); font-weight: 400; margin: 0 6px; }
+  .meta { color: var(--muted); font-size: 12px; }
+  header .meta:last-child { margin-left: auto; }
+  .grid { display: grid; gap: 12px; margin-bottom: 12px; }
+  .kpis { grid-template-columns: repeat(3, 1fr); }
+  .kpis.ov .hero { grid-row: span 2; }
+  @media (min-width: 1100px) {
+    .kpis { grid-template-columns: repeat(6, 1fr); }
+    .kpis.ov { grid-template-columns: 1.4fr repeat(4, 1fr); }
+    .kpis.ov .hero { grid-row: auto; }
+  }
+  .two { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+  .card { background: var(--surface); border: 1px solid var(--ring); border-radius: 12px; padding: 14px 16px; min-width: 0; }
+  .card > h2 { display: flex; align-items: baseline; gap: 8px; font-size: 13px; font-weight: 600; margin: 0 0 12px; }
+  .card > h2 .meta { margin-left: auto; font-weight: 400; }
+  .stat { display: flex; flex-direction: column; gap: 2px; }
+  .stat .label { color: var(--ink-2); font-size: 12px; }
+  .stat b { font-size: 26px; font-weight: 600; line-height: 1.2; }
+  .stat .sub { color: var(--muted); font-size: 12px; display: flex; flex-wrap: wrap; gap: 2px 10px; }
+  .stat.hero b { font-size: 48px; line-height: 1.05; }
+  .spark { display: block; margin-top: 6px; }
+  .spark .cur { fill: var(--accent); } .spark .prev { fill: var(--prev); } .spark .zero { fill: var(--grid); }
+  .st { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); font-size: 12px; white-space: nowrap; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--muted); }
+  .good { background: var(--good); } .warning { background: var(--warning); } .serious { background: var(--serious); }
+  .critical { background: var(--critical); } .accent { background: var(--accent); } .muted { background: var(--axis); }
+  .s-new { background: var(--s-new); } .s-needs-info { background: var(--warning); } .s-rejected { background: var(--s-rejected); }
+  .s-accepted { background: var(--s-accepted); } .s-building { background: var(--s-building); }
+  .s-in-review { background: var(--s-in-review); } .s-needs-human { background: var(--critical); } .s-done { background: var(--good); }
+  .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; border-radius: 8px; overflow: hidden; }
+  @media (min-width: 1000px) { .flow { grid-template-columns: repeat(8, 1fr); } }
+  .flow > div { background: var(--page); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+  .flow b { font-size: 22px; font-weight: 600; }
+  .flow .zero b { color: var(--muted); font-weight: 400; }
+  .chart { position: relative; height: 150px; margin: 4px 0 22px 30px; display: flex; align-items: flex-end; border-bottom: 1px solid var(--axis); }
+  .chart .gl { position: absolute; left: 0; right: 0; border-top: 1px solid var(--grid); }
+  .chart .gl span { position: absolute; right: 100%; transform: translate(-6px, -50%); color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+  .chart .col { flex: 1; height: 100%; position: relative; display: flex; justify-content: center; align-items: flex-end; outline: none; }
+  .chart .col:hover, .chart .col:focus-visible { background: var(--hover); }
+  .chart .bar { width: min(24px, 70%); background: var(--accent); border-radius: 4px 4px 0 0; position: relative; }
+  .chart .bar.none { height: 0; }
+  .chart .v { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); padding-bottom: 2px; font-size: 11px; color: var(--ink-2); }
+  .chart .x { position: absolute; top: 100%; padding-top: 4px; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .seg { display: flex; gap: 2px; height: 28px; }
+  .seg > div { border-radius: 4px; min-width: 2px; display: flex; align-items: center; padding: 0 8px; color: #fff; font-size: 12px; font-weight: 600; overflow: visible; white-space: nowrap; }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; list-style: none; padding: 0; margin: 10px 0 0; font-size: 12px; color: var(--ink-2); }
+  .legend li { display: inline-flex; align-items: center; gap: 6px; }
+  .sw { width: 10px; height: 10px; border-radius: 2px; }
+  details { margin-top: 10px; font-size: 12px; color: var(--muted); }
+  summary { cursor: pointer; }
+  .scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font-weight: 500; font-size: 12px; color: var(--muted); padding: 0 10px 8px 0; white-space: nowrap; border-bottom: 1px solid var(--grid); }
+  td { padding: 8px 10px 8px 0; border-bottom: 1px solid var(--grid); vertical-align: middle; white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td.title { white-space: normal; min-width: 180px; }
+  tbody tr.link { cursor: pointer; }
+  tbody tr.link:hover { background: var(--hover); }
+  tr.quiet td { color: var(--muted); }
+  td .sub { display: block; color: var(--muted); font-size: 12px; }
+  td.name { max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+  .runs { display: inline-flex; align-items: flex-end; gap: 8px; font-variant-numeric: tabular-nums; }
+  .list { list-style: none; margin: 0; padding: 0; }
+  .list li { display: grid; grid-template-columns: 96px 1fr auto; gap: 10px; align-items: baseline; padding: 7px 0; border-bottom: 1px solid var(--grid); }
+  .list li:last-child { border-bottom: 0; }
+  .list .t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .empty { color: var(--muted); font-size: 13px; padding: 8px 0; }
+  .err { color: var(--ink-2); font-size: 12px; display: inline-flex; gap: 6px; align-items: center; }
+  .board { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(220px, 300px); gap: 10px; overflow-x: auto; padding-bottom: 4px; margin-top: 12px; }
+  .lane { background: var(--page); border-radius: 10px; padding: 10px; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+  .lane h3 { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; margin: 0; color: var(--ink-2); white-space: nowrap; }
+  .lane h3 .n { margin-left: auto; color: var(--muted); font-weight: 400; }
+  .ticket { background: var(--surface); border: 1px solid var(--ring); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+  .ticket .t { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .ticket .foot { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; }
+  .more { color: var(--muted); font-size: 12px; }
+  @media (max-width: 560px) {
+    .wrap { padding: 16px 14px 32px; }
+    .kpis, .kpis.ov { grid-template-columns: 1fr 1fr; }
+    .kpis.ov .hero { grid-column: 1 / -1; grid-row: auto; }
+    .list li { grid-template-columns: 1fr auto; }
+    .list li > :first-child { grid-column: 1 / -1; }
+  }
 </style>
 </head>
 <body>
-<header>
-  <h1><a href="#">Factory</a></h1>
-  <div class="stamp" id="stamp" aria-live="polite">loading…</div>
-</header>
-<div id="stats"></div>
-<main id="view"></main>
+<div class="wrap">
+  <header id="head"><h1>Factory</h1><span class="meta" id="stamp">loading…</span></header>
+  <main id="view"></main>
+</div>
 <script>
+const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"})[c]);
-const chip = (text, cls = text) => `<span class="chip ${esc(cls)}">${esc(text)}</span>`;
 const ago = iso => {
   const m = Math.round((Date.now() - new Date(iso)) / 60000);
   return m < 60 ? `${m}m` : m < 1440 ? `${Math.round(m / 60)}h` : `${Math.round(m / 1440)}d`;
@@ -75,150 +133,223 @@ const ago = iso => {
 const dur = s => s == null ? "–" : s < 60 ? `${s}s` : s < 3600 ? `${Math.round(s / 60)}m` : `${(s / 3600).toFixed(1)}h`;
 const pct = r => r == null ? "–" : `${Math.round(r * 100)}%`;
 const within = (iso, days) => iso && Date.now() - new Date(iso) < days * 864e5;
-const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
-const ORDER = ["needs-you", "failed", "running", "ready", "done"];
-const LABEL = {"needs-you": "needs you", failed: "failed", running: "running", ready: "ready", done: "done"};
-const STAGES = ["new", "needs-info", "rejected", "accepted", "building", "in-review", "needs-human", "done"];
-const STAGE = {new: "new", "needs-info": "needs info", rejected: "rejected", accepted: "accepted", building: "building",
-               "in-review": "in review", "needs-human": "needs human", done: "done"};
+const day = iso => new Date(`${iso}T12:00:00`);
+
+// Every state is a dot plus its label: colour is never the only cue.
+const THREAD = {"needs-you": ["needs you", "critical"], failed: ["failed", "serious"], running: ["running", "accent"],
+                ready: ["ready", "warning"], done: ["done", "good"]};
+const ORDER = Object.keys(THREAD);
+const STAGES = [["new", "New"], ["needs-info", "Needs info"], ["rejected", "Rejected"], ["accepted", "Accepted"],
+                ["building", "Building"], ["in-review", "In review"], ["needs-human", "Needs human"], ["done", "Done"]];
+const STAGE = Object.fromEntries(STAGES);
+const CHECKS = {success: ["passing", "good"], failure: ["failing", "critical"], error: ["failing", "critical"],
+                pending: ["pending", "warning"], expected: ["pending", "warning"], none: ["no checks", "muted"]};
 const FLOW_LABELS = new Set(["factory", "factory:needs-info", "factory:rejected", "factory:building", "factory:needs-human"]);
+const PROVIDERS = ["claudeAgent", "codex", "opencode"];  // fixed order: a provider keeps its colour
 let last = null;
 
+const st = (label, tone) => `<span class="st"><i class="dot ${esc(tone)}"></i>${esc(label)}</span>`;
+const threadSt = state => st(...THREAD[state]);
+const checkSt = pr => pr.isDraft ? st("draft", "muted") : st(...(CHECKS[pr.checks] || CHECKS.none));
+const prFlags = pr => [
+  pr.reviewDecision === "CHANGES_REQUESTED" && st("changes requested", "critical"),
+  pr.reviewDecision === "APPROVED" && st("approved", "good"),
+  pr.mergeable === "CONFLICTING" && st("conflict", "critical"),
+].filter(Boolean).join(" ");
 const gh = p => p.github || {};
 const issuesOf = p => gh(p).issues || [];
 const failing = pr => pr.checks === "failure" || pr.checks === "error";
 const byState = (a, b) => ORDER.indexOf(a.state) - ORDER.indexOf(b.state);
+const lastActive = p => p.threads.reduce((m, t) => t.updated > m ? t.updated : m, "");
+const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
-function list(title, items, row) {
-  return items.length ? `<h3>${title}</h3><ul>${items.map(row).join("")}</ul>` : "";
-}
-const tile = (value, label, extra = "") => `<div class="tile"><b>${esc(value)}</b><span>${esc(label)}</span>${extra}</div>`;
-const stageChips = issues => STAGES.map(s => {
-  const n = issues.filter(i => i.stage === s).length;
-  return n ? chip(`${n} ${STAGE[s]}`, s) : "";
-}).join("");
-const prChips = pr => `${pr.isDraft ? chip("draft") : chip(pr.checks === "none" ? "no checks" : pr.checks, pr.checks)}
-  ${pr.reviewDecision === "CHANGES_REQUESTED" ? chip("changes", "changes_requested") : pr.reviewDecision === "APPROVED" ? chip("approved") : ""}
-  ${pr.mergeable === "CONFLICTING" ? chip("conflict", "conflicting") : ""}`;
-const threadRow = t => `<li>${chip(LABEL[t.state], t.state)}<span class="t" title="${esc(t.title)}">${esc(t.title)}</span>
-  ${t.prs.filter(pr => pr.state === "open").map(pr => `<a class="meta" href="${esc(pr.url)}">#${esc(pr.number)}</a>`).join("")}
-  <span class="meta">${esc(t.branch || "")} ${ago(t.updated)}</span></li>`;
-const prRow = pr => `<li>${prChips(pr)}
-  <a class="t" href="${esc(pr.url)}" title="${esc(pr.title)}">#${esc(pr.number)} ${esc(pr.title)}</a><span class="meta">${ago(pr.updatedAt)}</span></li>`;
-const issueRow = i => `<li>${chip(STAGE[i.stage], i.stage)}<a class="t" href="${esc(i.url)}" title="${esc(i.title)}">#${esc(i.number)} ${esc(i.title)}</a>
-  ${i.labels.filter(l => !FLOW_LABELS.has(l)).map(l => chip(l, "label")).join("")}
-  ${i.pr ? `${prChips(i.pr)}<a class="meta" href="${esc(i.pr.url)}">#${esc(i.pr.number)}</a>` : ""}
-  ${i.thread ? `<span title="${esc(i.thread.title)}">${chip(LABEL[i.thread.state], i.thread.state)}</span>` : ""}
-  <span class="meta">${ago(i.closedAt || i.updatedAt)}</span></li>`;
-const repoLink = p => p.repo ? `<a class="repo" href="https://github.com/${esc(p.repo)}">${esc(p.repo)}</a>` : `<span class="repo">${esc(p.root)}</span>`;
-const ghError = p => gh(p).error ? `<p class="err">GitHub: ${esc(gh(p).error)}</p>` : "";
-
-function globalStats(data) {
-  const ps = data.projects, st = data.stats;
-  const issues = ps.flatMap(issuesOf), threads = ps.flatMap(p => p.threads);
-  const prs = ps.flatMap(p => gh(p).prs || []), merged = ps.flatMap(p => gh(p).merged || []);
-  const states = ORDER.slice(0, 4).map(s => {
-    const n = threads.filter(t => t.state === s).length;
-    return n ? chip(`${n} ${LABEL[s]}`, s) : "";
-  }).join("");
-  return `<div class="tiles" aria-label="All projects">
-    ${tile(issues.length, "issues", `<div class="chips">${stageChips(issues)}</div>`)}
-    ${tile(threads.filter(t => t.state !== "done").length, "active threads", `<div class="chips">${states}</div>`)}
-    ${tile(st.runs7, "runs, 7 days")}
-    ${tile(dur(st.agent7), "agent time, 7 days")}
-    ${tile(pct(st.failRate30), "runs failed, 30 days")}
-    ${tile(prs.length, "open PRs")}
-    ${tile(prs.filter(failing).length, "failing PRs")}
-    ${tile(merged.filter(pr => within(pr.mergedAt, 7)).length, "merged, 7 days")}
-  </div>`;
+function stat(label, value, sub = "", extra = "", cls = "") {
+  return `<div class="card stat ${cls}"><span class="label">${esc(label)}</span><b>${esc(value)}</b>
+    ${sub ? `<span class="sub">${sub}</span>` : ""}${extra}</div>`;
 }
 
-function card(p) {
-  const open = p.threads.filter(t => t.state !== "done").sort(byState);
-  const done = p.threads.length - open.length;
-  const prs = gh(p).prs || [], issues = issuesOf(p), openIssues = issues.filter(i => i.stage !== "done");
-  const merged = (gh(p).merged || []).slice(0, 5);
-  const quiet = !open.length && !prs.length && !openIssues.length;
-  return `<section class="project${quiet ? " quiet" : ""}" aria-label="${esc(p.title)}">
-    <h2><a href="#${esc(encodeURIComponent(p.id))}">${esc(p.title)} →</a></h2>
-    ${repoLink(p)}
-    ${issues.length ? `<div class="stages">${stageChips(issues)}</div>` : ""}
-    ${list("Threads", open, threadRow)}
-    ${list("Pull requests", prs, prRow)}
-    ${list("Issues", openIssues, issueRow)}
-    ${list("Merged", merged, pr => `<li><a class="t" href="${esc(pr.url)}">#${esc(pr.number)} ${esc(pr.title)}</a><span class="meta">${ago(pr.mergedAt)}</span></li>`)}
-    ${quiet ? `<p class="empty">Nothing open.${done ? ` ${plural(done, "finished thread")}.` : ""}</p>` : done ? `<p class="empty">${plural(done, "finished thread")} hidden.</p>` : ""}
-    ${ghError(p)}
-  </section>`;
+function spark(daily, w = 112, h = 26) {  // 14 days; the last 7 (the stat's period) in the accent
+  const max = Math.max(1, ...daily.map(d => d.runs)), bw = w / daily.length;
+  return `<svg class="spark" width="${w}" height="${h}" aria-hidden="true">${daily.map((d, i) => {
+    const bh = d.runs ? Math.max(2, d.runs / max * h) : 1;
+    const cls = !d.runs ? "zero" : i >= daily.length - 7 ? "cur" : "prev";
+    return `<rect class="${cls}" x="${(i * bw + 1).toFixed(1)}" y="${(h - bh).toFixed(1)}" width="${(bw - 2).toFixed(1)}" height="${bh.toFixed(1)}" rx="1"/>`;
+  }).join("")}</svg>`;
 }
 
-function chart(daily) {
-  const max = Math.max(1, ...daily.map(d => d.runs));
+function columns(daily) {
+  const peak = Math.max(...daily.map(d => d.runs));
+  const e = 10 ** Math.floor(Math.log10(Math.max(peak, 1)));
+  const top = [2, 4, 6, 8, 10].map(f => f * e).find(x => x >= peak);  // gridline at half stays a whole number
   const total = daily.reduce((n, d) => n + d.runs, 0);
-  return `<h3>Runs per day, 14 days</h3>
-    <div class="chart" role="img" aria-label="${esc(`${total} runs in 14 days, at most ${max} in a day`)}">
-      ${daily.map(d => `<div style="height:${Math.round(d.runs / max * 100)}%" title="${esc(`${d.date}: ${d.runs}`)}"></div>`).join("")}
-    </div>
-    <div class="axis"><span>${esc(daily[0].date)}</span><span>${esc(daily.at(-1).date)}</span></div>`;
+  const label = d => day(d.date).toLocaleDateString(undefined, {month: "short", day: "numeric"});
+  const lines = [0.5, 1].map(f => `<div class="gl" style="bottom:${f * 100}%"><span>${top * f}</span></div>`).join("");
+  return `<div class="chart" role="img" aria-label="${esc(`${total} runs in 14 days, peak ${peak} in a day`)}">${lines}
+    <div class="gl" style="bottom:0;border:0"><span>0</span></div>
+    ${daily.map((d, i) => `<div class="col" tabindex="0" title="${esc(`${label(d)}: ${plural(d.runs, "run")}`)}">
+      <div class="bar${d.runs ? "" : " none"}" style="height:${d.runs / top * 100}%">${d.runs && d.runs === peak ? `<span class="v">${d.runs}</span>` : ""}</div>
+      ${i % 2 === daily.length % 2 ? "" : `<span class="x">${esc(day(d.date).getDate())}</span>`}</div>`).join("")}
+  </div>
+  <details><summary>Table</summary><table><thead><tr><th>Day</th><th class="num">Runs</th></tr></thead><tbody>
+    ${daily.map(d => `<tr><td>${esc(label(d))}</td><td class="num">${d.runs}</td></tr>`).join("")}</tbody></table></details>`;
 }
 
-function detail(p) {
-  const st = p.stats, issues = issuesOf(p), prs = gh(p).prs || [];
-  const threads = [...p.threads].sort(byState);
-  const providers = Object.entries(st.providers30).map(([k, n]) => chip(`${n} ${k}`, "none")).join("");
-  return `<a class="back" href="#">← All projects</a>
-    <section class="project" aria-label="${esc(p.title)}">
-      <h2>${esc(p.title)}</h2>
-      ${repoLink(p)}
-      <div class="tiles">
-        ${tile(st.runs7, "runs, 7 days")}
-        ${tile(st.runs30, "runs, 30 days")}
-        ${tile(dur(st.agent30), "agent time, 30 days")}
-        ${tile(dur(st.median30), "median run")}
-        ${tile(pct(st.failRate30), "runs failed, 30 days")}
-        ${tile(issues.filter(i => i.stage === "done" && within(i.closedAt, 30)).length, "issues closed, 30 days")}
-        ${tile((gh(p).merged || []).filter(pr => within(pr.mergedAt, 30)).length, "PRs merged, 30 days")}
-      </div>
-      ${providers ? `<div class="stages">${providers}</div>` : ""}
-      ${chart(st.daily)}
-      ${STAGES.map(s => list(`${STAGE[s]} (${issues.filter(i => i.stage === s).length})`, issues.filter(i => i.stage === s), issueRow)).join("")}
-      ${issues.length ? "" : `<h3>Issues</h3><p class="empty">${p.repo ? "No issues." : "Not a GitHub repository."}</p>`}
-      ${list("Pull requests", prs, prRow)}
-      ${list(`Threads (${threads.length})`, threads, threadRow)}
-      ${ghError(p)}
-    </section>`;
+function providerSplit(counts) {
+  const parts = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  const total = parts.reduce((n, [, c]) => n + c, 0);
+  if (!total) return `<p class="empty">No runs in 30 days.</p>`;
+  const slot = name => { const i = PROVIDERS.indexOf(name); return i < 0 ? 4 : i + 1; };
+  return `<div class="seg" role="img" aria-label="${esc(parts.map(([n, c]) => `${n} ${c}`).join(", "))}">${parts.map(([n, c]) => {
+    const share = Math.round(c / total * 100);
+    return `<div style="flex:${c} 1 0;background:var(--c${slot(n)})" title="${esc(`${n}: ${plural(c, "run")} (${share}%)`)}">${share >= 12 ? `${share}%` : ""}</div>`;
+  }).join("")}</div>
+  <ul class="legend">${parts.map(([n, c]) => `<li><i class="sw" style="background:var(--c${slot(n)})"></i>${esc(n)} · ${c}</li>`).join("")}</ul>`;
+}
+
+function attention(projects) {
+  const rank = ["needs you", "needs human", "failed", "failing", "conflict", "changes requested", "ready", "needs info"];
+  const items = [];
+  for (const p of projects) {
+    for (const t of p.threads) if (["needs-you", "failed", "ready"].includes(t.state))
+      items.push({kind: THREAD[t.state][0], tone: THREAD[t.state][1], title: t.title, p, when: t.updated});
+    for (const pr of gh(p).prs || []) {
+      const kind = failing(pr) ? ["failing", "critical"] : pr.mergeable === "CONFLICTING" ? ["conflict", "critical"]
+        : pr.reviewDecision === "CHANGES_REQUESTED" ? ["changes requested", "critical"] : null;
+      if (kind) items.push({kind: kind[0], tone: kind[1], title: `#${pr.number} ${pr.title}`, url: pr.url, p, when: pr.updatedAt});
+    }
+    for (const i of issuesOf(p)) if (i.stage === "needs-human" || i.stage === "needs-info")
+      items.push({kind: STAGE[i.stage].toLowerCase(), tone: `s-${i.stage}`, title: `#${i.number} ${i.title}`, url: i.url, p, when: i.updatedAt});
+  }
+  items.sort((a, b) => rank.indexOf(a.kind) - rank.indexOf(b.kind) || (b.when > a.when ? 1 : -1));
+  if (!items.length) return `<p class="empty">Nothing is waiting on you.</p>`;
+  return `<ul class="list">${items.slice(0, 8).map(x => `<li>${st(x.kind, x.tone)}
+    <span class="t">${x.url ? `<a href="${esc(x.url)}">${esc(x.title)}</a>` : esc(x.title)} <span class="meta">${esc(x.p.title)}</span></span>
+    <span class="meta">${ago(x.when)}</span></li>`).join("")}</ul>
+    ${items.length > 8 ? `<p class="more">${items.length - 8} more</p>` : ""}`;
+}
+
+function flow(issues) {  // every stage, in flow order, with its count
+  return `<div class="flow">${STAGES.map(([k, name]) => {
+    const c = issues.filter(i => i.stage === k).length;
+    return `<div class="${c ? "" : "zero"}">${st(name, `s-${k}`)}<b>${c}</b></div>`;
+  }).join("")}</div>`;
+}
+
+function overview(data) {
+  const ps = data.projects, s = data.stats;
+  const threads = ps.flatMap(p => p.threads), issues = ps.flatMap(issuesOf);
+  const prs = ps.flatMap(p => gh(p).prs || []), merged = ps.flatMap(p => gh(p).merged || []);
+  const n = state => threads.filter(t => t.state === state).length;
+  const waiting = n("needs-you") + n("ready") + issues.filter(i => i.stage === "needs-human").length;
+  const rows = ps.map(p => {
+    const open = p.threads.filter(t => t.state !== "done");
+    const iss = issuesOf(p), openIss = iss.filter(i => i.stage !== "done"), pp = gh(p).prs || [];
+    const flagged = open.find(t => t.state === "needs-you") || open.find(t => t.state === "failed");
+    const quiet = !open.length && !openIss.length && !pp.length && !p.stats.runs7;
+    return `<tr class="link${quiet ? " quiet" : ""}" data-href="#${esc(encodeURIComponent(p.id))}">
+      <td class="name"><a href="#${esc(encodeURIComponent(p.id))}"><b>${esc(p.title)}</b></a><span class="sub" title="${esc(p.repo || "")}">${esc(p.repo || "local only")}</span></td>
+      <td><span class="runs">${spark(p.stats.daily, 70, 18)}${p.stats.runs7}</span></td>
+      <td>${flagged ? threadSt(flagged.state) : open.length ? `${open.length} active` : `<span class="meta">–</span>`}</td>
+      <td>${gh(p).error ? `<span class="err"><i class="dot critical"></i>GitHub error</span>`
+        : !p.repo ? `<span class="meta">–</span>` : openIss.length ? `${openIss.length} open` : `<span class="meta">0 open</span>`}
+        ${iss.length - openIss.length ? `<span class="sub">${iss.length - openIss.length} done</span>` : ""}</td>
+      <td class="num">${pp.length}${pp.some(failing) ? ` <span class="st"><i class="dot critical"></i>${pp.filter(failing).length} failing</span>` : ""}</td>
+      <td class="num">${(gh(p).merged || []).filter(m => within(m.mergedAt, 30)).length}</td>
+      <td class="num meta">${lastActive(p) ? ago(lastActive(p)) : "–"}</td></tr>`;
+  }).join("");
+  return `<div class="grid kpis ov">
+      ${stat("Waiting on you", waiting, `<span>${n("needs-you")} need you</span><span>${n("ready")} to review</span>`, "", "hero")}
+      ${stat("Runs, 7 days", s.runs7, `<span>${pct(s.failRate30)} failed (30d)</span>`, spark(s.daily))}
+      ${stat("Agent time, 7 days", dur(s.agent7), `median run ${dur(s.median30)}`)}
+      ${stat("Open PRs", prs.length, prs.some(failing) ? st(`${prs.filter(failing).length} failing`, "critical") : "none failing")}
+      ${stat("Merged, 7 days", merged.filter(m => within(m.mergedAt, 7)).length, `${merged.filter(m => within(m.mergedAt, 30)).length} in 30 days`)}
+    </div>
+    <section class="card"><h2>Issue flow <span class="meta">all projects · ${plural(issues.length, "issue")} tracked</span></h2>${flow(issues)}</section>
+    <div class="grid two" style="margin-top:12px">
+      <section class="card"><h2>Runs per day <span class="meta">last 14 days</span></h2>${columns(s.daily)}</section>
+      <section class="card"><h2>Waiting on you <span class="meta">${plural(waiting, "item")}</span></h2>${attention(ps)}</section>
+    </div>
+    <section class="card"><h2>Projects <span class="meta">${ps.length}</span></h2><div class="scroll"><table>
+      <thead><tr><th>Project</th><th>Runs (7d)</th><th>Threads</th><th>Issues</th>
+        <th class="num">Open PRs</th><th class="num">Merged (30d)</th><th class="num">Active</th></tr></thead>
+      <tbody>${rows}</tbody></table></div></section>`;
+}
+
+function project(p) {
+  const s = p.stats, iss = issuesOf(p), prs = gh(p).prs || [], threads = [...p.threads].sort(byState);
+  const lanes = STAGES.filter(([k]) => iss.some(i => i.stage === k));
+  const board = lanes.map(([k, name]) => {
+    const items = iss.filter(i => i.stage === k), shown = k === "done" ? items.slice(0, 6) : items;
+    return `<div class="lane"><h3>${st("", `s-${k}`)}<span>${esc(name)}</span><span class="n">${items.length}</span></h3>
+      ${shown.map(i => `<div class="ticket"><a class="t" href="${esc(i.url)}" title="${esc(i.title)}"><span class="meta">#${esc(i.number)}</span> ${esc(i.title)}</a>
+        ${i.pr || i.thread || i.labels.some(l => !FLOW_LABELS.has(l)) ? `<div class="foot">
+          ${i.pr ? `<a class="meta" href="${esc(i.pr.url)}">PR #${esc(i.pr.number)}</a>${checkSt(i.pr)}${prFlags(i.pr)}` : ""}
+          ${i.thread ? `<span title="${esc(i.thread.title)}">${threadSt(i.thread.state)}</span>` : ""}
+          ${i.labels.filter(l => !FLOW_LABELS.has(l)).map(l => `<span class="meta">${esc(l)}</span>`).join("")}</div>` : ""}
+        <span class="meta">${k === "done" ? "closed" : "updated"} ${ago(i.closedAt || i.updatedAt)} ago</span></div>`).join("")}
+      ${items.length > shown.length ? `<span class="more">${items.length - shown.length} more</span>` : ""}</div>`;
+  }).join("");
+  return `<div class="grid kpis">
+      ${stat("Runs, 7 days", s.runs7, `${s.runs30} in 30 days`, spark(s.daily))}
+      ${stat("Agent time, 30 days", dur(s.agent30), `${dur(s.agent7)} in 7 days`)}
+      ${stat("Median run", dur(s.median30), "30 days")}
+      ${stat("Runs failed, 30 days", pct(s.failRate30), "failed or interrupted")}
+      ${stat("Issues closed, 30 days", iss.filter(i => i.stage === "done" && within(i.closedAt, 30)).length, `${iss.filter(i => i.stage !== "done").length} open`)}
+      ${stat("PRs merged, 30 days", (gh(p).merged || []).filter(m => within(m.mergedAt, 30)).length, `${prs.length} open`)}
+    </div>
+    <section class="card"><h2>Issues <span class="meta">${p.repo ? plural(iss.length, "issue") + " tracked" : "not a GitHub repository"}</span></h2>
+      ${gh(p).error ? `<p class="err"><i class="dot critical"></i>GitHub: ${esc(gh(p).error)}</p>` : ""}
+      ${p.repo ? flow(iss) + (lanes.length ? `<div class="board">${board}</div>` : "") : ""}</section>
+    <div class="grid two" style="margin-top:12px">
+      <section class="card"><h2>Runs per day <span class="meta">last 14 days</span></h2>${columns(s.daily)}</section>
+      <section class="card"><h2>Runs by provider <span class="meta">last 30 days</span></h2>${providerSplit(s.providers30)}</section>
+    </div>
+    <section class="card" style="margin-bottom:12px"><h2>Pull requests <span class="meta">${prs.length} open</span></h2>
+      ${prs.length ? `<div class="scroll"><table><thead><tr><th>Checks</th><th>Pull request</th><th>Review</th><th class="num">Updated</th></tr></thead><tbody>
+        ${prs.map(pr => `<tr><td>${checkSt(pr)}</td><td class="title"><a href="${esc(pr.url)}">#${esc(pr.number)} ${esc(pr.title)}</a></td>
+          <td>${prFlags(pr) || `<span class="meta">–</span>`}</td><td class="num meta">${ago(pr.updatedAt)}</td></tr>`).join("")}</tbody></table></div>`
+        : `<p class="empty">No open pull requests.</p>`}</section>
+    <section class="card"><h2>Threads <span class="meta">${threads.length}</span></h2>
+      ${threads.length ? `<div class="scroll"><table><thead><tr><th>State</th><th>Thread</th><th>Branch</th><th>PR</th><th class="num">Updated</th></tr></thead><tbody>
+        ${threads.map(t => `<tr${t.state === "done" ? ` class="quiet"` : ""}><td>${threadSt(t.state)}</td><td class="title">${esc(t.title)}</td>
+          <td class="meta">${esc(t.branch || "–")}</td>
+          <td>${t.prs.filter(pr => pr.state === "open").map(pr => `<a href="${esc(pr.url)}">#${esc(pr.number)}</a>`).join(" ") || `<span class="meta">–</span>`}</td>
+          <td class="num meta">${ago(t.updated)}</td></tr>`).join("")}</tbody></table></div>` : `<p class="empty">No threads.</p>`}</section>`;
 }
 
 function render() {
   if (!last) return;
   let id = location.hash.slice(1);
   try { id = decodeURIComponent(id); } catch {}  // a malformed hash just matches no project
-  const view = document.getElementById("view");
-  view.classList.toggle("detail", !!id);
-  document.getElementById("stats").innerHTML = id ? "" : globalStats(last);
+  const p = id && last.projects.find(p => p.id === id);
+  const stamp = $("stamp").outerHTML;
   if (!id) {
-    view.innerHTML = last.projects.map(card).join("");
-    document.title = "Factory";
-    return;
+    $("head").innerHTML = `<h1>Factory</h1><span class="meta">${plural(last.projects.length, "project")}</span>${stamp}`;
+    $("view").innerHTML = overview(last);
+  } else {
+    $("head").innerHTML = `<div class="crumb"><a href="#">Factory</a><span class="sep">/</span>${esc(p ? p.title : "Unknown project")}</div>
+      ${p && p.repo ? `<a class="meta" href="https://github.com/${esc(p.repo)}">${esc(p.repo)}</a>` : ""}${stamp}`;
+    $("view").innerHTML = p ? project(p) : `<p class="empty">Project not found. <a href="#">Back to all projects</a></p>`;
   }
-  const p = last.projects.find(p => p.id === id);
-  view.innerHTML = p ? detail(p) : `<a class="back" href="#">← All projects</a><p class="empty">Project not found.</p>`;
   document.title = p ? `${p.title} · Factory` : "Factory";
 }
 
 async function refresh() {
-  const stamp = document.getElementById("stamp");
   try {
     const res = await fetch("/api/state");
     const data = await res.json();
     if (!res.ok) throw new Error(data.error);
     last = data;
     render();
-    stamp.textContent = `updated ${new Date().toLocaleTimeString()}`;
+    $("stamp").textContent = `updated ${new Date().toLocaleTimeString()}`;
   } catch (e) {
-    stamp.textContent = `refresh failed: ${e.message}`;
+    $("stamp").textContent = `refresh failed: ${e.message}`;
   }
 }
+document.addEventListener("click", e => {  // whole project row opens the project
+  const row = e.target.closest("tr[data-href]");
+  if (row && !e.target.closest("a")) location.hash = row.dataset.href;
+});
 addEventListener("hashchange", () => { render(); scrollTo(0, 0); });
 refresh();
 setInterval(refresh, 5000);
