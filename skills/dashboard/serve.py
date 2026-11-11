@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Local dashboard for every T3 Code project: threads, pull requests, issues.
+"""Local dashboard for every T3 Code project: issues, threads, pull requests, stats.
 
 Usage: python3 skills/dashboard/serve.py [port]     (default 7420, localhost only)
 
@@ -11,9 +11,12 @@ import os
 import re
 import sqlite3
 import subprocess
+import statistics
 import sys
 import time
+from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -23,11 +26,14 @@ GH_TTL = 120  # seconds; one GraphQL call per repo per TTL keeps well under the 
 GH_QUERY = """
 query($owner: String!, $name: String!) { repository(owner: $owner, name: $name) {
   issues(states: OPEN, first: 30, orderBy: {field: UPDATED_AT, direction: DESC}) {
-    nodes { number title url updatedAt labels(first: 6) { nodes { name } } } }
+    nodes { number title url updatedAt labels(first: 10) { nodes { name } } } }
+  closed: issues(states: CLOSED, first: 20, orderBy: {field: UPDATED_AT, direction: DESC}) {
+    nodes { number title url updatedAt closedAt labels(first: 10) { nodes { name } } } }
   open: pullRequests(states: OPEN, first: 30, orderBy: {field: UPDATED_AT, direction: DESC}) {
     nodes { number title url isDraft headRefName reviewDecision mergeable updatedAt
+            closingIssuesReferences(first: 5) { nodes { number } }
             commits(last: 1) { nodes { commit { statusCheckRollup { state } } } } } }
-  merged: pullRequests(states: MERGED, first: 5, orderBy: {field: UPDATED_AT, direction: DESC}) {
+  merged: pullRequests(states: MERGED, first: 30, orderBy: {field: UPDATED_AT, direction: DESC}) {
     nodes { number title url mergedAt } }
 } }
 """
@@ -43,7 +49,7 @@ def t3_projects():
     db = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)
     try:
         projects = {
-            pid: {"id": pid, "title": title, "root": root, "threads": []}
+            pid: {"id": pid, "title": title, "root": root, "threads": [], "runs": []}
             for pid, title, root in db.execute(
                 "select project_id, title, workspace_root from projection_projects where deleted_at is null")
         }
@@ -53,6 +59,13 @@ def t3_projects():
         waiting = {t for (t,) in db.execute(
             "select thread_id from orchestration_v2_projection_runtime_requests"
             " where status not in ('resolved', 'cancelled')")}
+        for pid, status, provider, start, end in db.execute(
+                "select t.project_id, r.status, r.provider,"
+                " coalesce(json_extract(r.payload_json, '$.startedAt'), r.requested_at), r.completed_at"
+                " from orchestration_v2_projection_runs r join orchestration_v2_projection_threads t using (thread_id)"
+                " where t.deleted_at is null"):
+            if pid in projects:  # every thread counts here, archived and child threads included
+                projects[pid]["runs"].append({"status": status, "provider": provider, "start": start, "end": end})
         rows = db.execute(
             "select thread_id, project_id, title, updated_at, payload_json"
             " from orchestration_v2_projection_threads"
@@ -93,6 +106,49 @@ def thread_state(run, waiting, settled):
     return "ready"  # finished, not yet settled: waiting for you to look
 
 
+def issue_stage(labels, closed, open_pr):
+    """Where an issue is in the factory flow; the first rule that matches wins."""
+    if closed:
+        return "done"
+    if "factory:needs-human" in labels:
+        return "needs-human"
+    if open_pr:
+        return "in-review"
+    for label, stage in (("factory:building", "building"), ("factory:needs-info", "needs-info"),
+                         ("factory:rejected", "rejected"), ("factory", "accepted")):
+        if label in labels:
+            return stage
+    return "new"
+
+
+def run_stats(runs, now):
+    """Agent activity from T3 runs: last 7 and 30 days, and runs per day for 14 days."""
+    def ts(iso):
+        return datetime.fromisoformat(iso).timestamp() if iso else None
+
+    def window(days):
+        return [(r, start, ts(r["end"])) for r, start in timed if now - start < days * 86400]
+
+    timed = [(r, ts(r["start"])) for r in runs if r["start"]]
+    week, month = window(7), window(30)
+    finished = [(r, start, end) for r, start, end in month if r["status"] != "running"]
+    durations = [end - start for _, start, end in finished if end]
+    today = datetime.fromtimestamp(now).date()
+    per_day = Counter(datetime.fromtimestamp(start).date() for _, start in timed)
+    return {
+        "runs7": len(week),
+        "runs30": len(month),
+        "agent7": round(sum(end - start for _, start, end in week if end)),
+        "agent30": round(sum(durations)),
+        "failRate30": (sum(r["status"] in ("failed", "interrupted") for r, _, _ in finished) / len(finished)
+                       if finished else None),
+        "median30": round(statistics.median(durations)) if durations else None,
+        "providers30": dict(Counter(r["provider"] for r, _, _ in month).most_common()),
+        "daily": [{"date": str(d), "runs": per_day[d]}
+                  for d in (today - timedelta(days=i) for i in range(13, -1, -1))],
+    }
+
+
 def github_slug(root):
     res = subprocess.run(["git", "-C", root, "remote", "get-url", "origin"], capture_output=True, text=True)
     m = re.search(r"github\.com[:/]([^/]+)/(.+?)(?:\.git)?/?$", res.stdout.strip())
@@ -110,17 +166,19 @@ def github(slug):
     if res.returncode != 0:
         return {"error": (res.stderr.strip().splitlines() or ["gh failed"])[-1]}  # not cached: retry next poll
     repo = json.loads(res.stdout)["data"]["repository"]
-    data = {
-        "issues": [
-            {**i, "labels": [label["name"] for label in i.pop("labels")["nodes"]]}
-            for i in repo["issues"]["nodes"]
-        ],
-        "prs": [
-            {**pr, "checks": checks(pr.pop("commits"))}
-            for pr in repo["open"]["nodes"]
-        ],
-        "merged": repo["merged"]["nodes"],
-    }
+    prs = [
+        {**pr, "checks": checks(pr.pop("commits")),
+         "closes": [i["number"] for i in pr.pop("closingIssuesReferences")["nodes"]]}
+        for pr in repo["open"]["nodes"]
+    ]
+    closer = {n: pr for pr in prs for n in pr["closes"]}
+    issues = []
+    for i in repo["issues"]["nodes"] + repo["closed"]["nodes"]:
+        labels = [label["name"] for label in i.pop("labels")["nodes"]]
+        pr = None if i.get("closedAt") else closer.get(i["number"])
+        issues.append({**i, "labels": labels, "stage": issue_stage(labels, bool(i.get("closedAt")), pr),
+                       "pr": pr and {k: pr[k] for k in ("number", "url", "isDraft", "checks", "reviewDecision", "mergeable")}})
+    data = {"issues": issues, "prs": prs, "merged": repo["merged"]["nodes"]}
     _gh_cache[slug] = (time.time(), data)
     return data
 
@@ -138,8 +196,17 @@ def state():
     with ThreadPoolExecutor(8) as pool:
         for p, gh in zip(projects, pool.map(lambda p: github(p["repo"]) if p["repo"] else None, projects)):
             p["github"] = gh
+    now = time.time()
+    for p in projects:
+        by_pr = {pr["url"]: t for t in reversed(p["threads"]) for pr in t["prs"]}  # newest thread wins
+        if p["github"] and "issues" in p["github"]:  # copy: the cached dict may be shared with another project
+            p["github"] = {**p["github"], "issues": [
+                {**i, "thread": (t := i["pr"] and by_pr.get(i["pr"]["url"])) and {k: t[k] for k in ("id", "title", "state")}}
+                for i in p["github"]["issues"]]}
+        p["stats"] = run_stats(p["runs"], now)
+    everything = run_stats([r for p in projects for r in p.pop("runs")], now)
     projects.sort(key=lambda p: max((t["updated"] for t in p["threads"]), default=""), reverse=True)
-    return {"generatedAt": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "projects": projects}
+    return {"generatedAt": time.strftime("%Y-%m-%dT%H:%M:%S%z"), "stats": everything, "projects": projects}
 
 
 class Handler(BaseHTTPRequestHandler):

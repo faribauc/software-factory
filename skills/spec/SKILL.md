@@ -88,9 +88,9 @@ creating any that are missing with `gh label create <name> --force`:
 
 | Decision | Comment | Labels |
 | --- | --- | --- |
-| ACCEPT | the spec | add `factory`, remove `factory:needs-info` |
-| NEEDS-INFO | the questions | add `factory:needs-info` |
-| REJECT | the reason, politely | remove `factory` and `factory:needs-info` |
+| ACCEPT | the spec | add `factory`, remove `factory:needs-info` and `factory:rejected` |
+| NEEDS-INFO | the questions | add `factory:needs-info`, remove `factory:rejected` |
+| REJECT | the reason, politely | add `factory:rejected`, remove `factory` and `factory:needs-info` |
 
 Never close an issue yourself. When the author answers a NEEDS-INFO question,
 start again from step 1; an earlier spec comment is history, not the answer.

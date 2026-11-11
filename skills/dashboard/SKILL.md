@@ -5,8 +5,9 @@ description: Start or open the local dashboard of every T3 Code project's thread
 
 # Dashboard
 
-One page for every project T3 Code manages: which threads are running or need
-the user, open PRs with their checks, open issues, and recent merges. It reads
+One page for every project T3 Code manages: where each issue is in the flow,
+which threads are running or need the user, open PRs with their checks, recent
+merges, and agent activity. It reads
 T3's database read-only and GitHub through `gh`, and writes nothing.
 
 ## Start it
@@ -28,6 +29,33 @@ open it in the preview only if the user asks to see it there.
 
 ## What it shows
 
+The overview (`/`) has stats across all projects, then a card per project.
+Click a project's name to open its view (`/#<project id>`): every issue by
+stage, all threads including finished ones, open PRs, and the project's stats
+with a 14-day chart of runs per day.
+
+Issue stages, from GitHub. The first rule that matches wins:
+
+| Stage | How it's detected |
+| --- | --- |
+| done | the issue is closed |
+| needs human | label `factory:needs-human`: the merge gate needs the user's decision |
+| in review | an open PR closes it (`Closes #<n>`) |
+| building | label `factory:building`: a build or ship run is working on it |
+| needs info | label `factory:needs-info`: spec asked the author a question |
+| rejected | label `factory:rejected`: spec declined it |
+| accepted | label `factory`: spec accepted it |
+| new | none of the above |
+
+An issue in review also shows its PR's chips and the state of the T3 thread
+that owns that PR.
+
+Stats come from T3's runs: runs in the last 7 and 30 days, agent time, median
+run length, the share of runs that failed or were interrupted, and runs per
+provider. PRs merged and issues closed come from GitHub. GitHub returns at most
+30 open issues, 20 closed issues, 30 open PRs and 30 merged PRs per repository,
+so counts for busy repos are lower bounds.
+
 Thread states, worked out from T3's records:
 
 | State | Meaning |
@@ -36,7 +64,7 @@ Thread states, worked out from T3's records:
 | failed | the last run failed or was interrupted |
 | running | a run is in progress |
 | ready | the last run finished and the thread isn't settled yet |
-| done | settled; hidden, and counted per project |
+| done | settled; hidden on the overview, listed in the project view |
 
 PR chips: check status (`success`, `failure`, `pending`, `no checks`), `draft`,
 `approved`, `changes`, `conflict`. GitHub results are cached for two minutes,
