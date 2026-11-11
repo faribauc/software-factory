@@ -198,10 +198,11 @@ def state():
             p["github"] = gh
     now = time.time()
     for p in projects:
-        by_pr = {pr["url"]: t for t in p["threads"] for pr in t["prs"]}
-        for i in (p["github"] or {}).get("issues") or []:
-            t = i["pr"] and by_pr.get(i["pr"]["url"])
-            i["thread"] = t and {k: t[k] for k in ("id", "title", "state")}
+        by_pr = {pr["url"]: t for t in reversed(p["threads"]) for pr in t["prs"]}  # newest thread wins
+        if p["github"] and "issues" in p["github"]:  # copy: the cached dict may be shared with another project
+            p["github"] = {**p["github"], "issues": [
+                {**i, "thread": (t := i["pr"] and by_pr.get(i["pr"]["url"])) and {k: t[k] for k in ("id", "title", "state")}}
+                for i in p["github"]["issues"]]}
         p["stats"] = run_stats(p["runs"], now)
     everything = run_stats([r for p in projects for r in p.pop("runs")], now)
     projects.sort(key=lambda p: max((t["updated"] for t in p["threads"]), default=""), reverse=True)

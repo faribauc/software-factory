@@ -25,8 +25,8 @@
   .repo:hover { text-decoration: underline; }
   h3 { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 14px 0 4px; font-weight: 600; }
   ul { list-style: none; margin: 0; padding: 0; }
-  li { display: flex; gap: 8px; align-items: baseline; padding: 3px 0; min-width: 0; }
-  li .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  li { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; padding: 3px 0; min-width: 0; }
+  li .t { flex: 1 1 12em; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   li .meta { color: var(--muted); font-size: 12px; white-space: nowrap; }
   a { color: inherit; }
   .chip { font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 99px; border: 1px solid currentColor; white-space: nowrap; }
@@ -46,7 +46,7 @@
   .tiles { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 24px 0; }
   .tile { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; min-width: 120px; }
   .tile b { display: block; font-size: 18px; }
-  .tile span { color: var(--muted); font-size: 12px; }
+  .tile > span { color: var(--muted); font-size: 12px; }
   .tile .chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
   main.detail { max-width: 980px; }
   .back { color: var(--muted); font-size: 13px; }
@@ -93,7 +93,7 @@ function list(title, items, row) {
   return items.length ? `<h3>${title}</h3><ul>${items.map(row).join("")}</ul>` : "";
 }
 const tile = (value, label, extra = "") => `<div class="tile"><b>${esc(value)}</b><span>${esc(label)}</span>${extra}</div>`;
-const stageChips = (issues, stages = STAGES) => stages.map(s => {
+const stageChips = issues => STAGES.map(s => {
   const n = issues.filter(i => i.stage === s).length;
   return n ? chip(`${n} ${STAGE[s]}`, s) : "";
 }).join("");
@@ -122,7 +122,7 @@ function globalStats(data) {
     return n ? chip(`${n} ${LABEL[s]}`, s) : "";
   }).join("");
   return `<div class="tiles" aria-label="All projects">
-    ${tile(issues.filter(i => i.stage !== "done").length, "open issues", `<div class="chips">${stageChips(issues, STAGES.slice(0, -1))}</div>`)}
+    ${tile(issues.length, "issues", `<div class="chips">${stageChips(issues)}</div>`)}
     ${tile(threads.filter(t => t.state !== "done").length, "active threads", `<div class="chips">${states}</div>`)}
     ${tile(st.runs7, "runs, 7 days")}
     ${tile(dur(st.agent7), "agent time, 7 days")}
@@ -191,7 +191,8 @@ function detail(p) {
 
 function render() {
   if (!last) return;
-  const id = decodeURIComponent(location.hash.slice(1));
+  let id = location.hash.slice(1);
+  try { id = decodeURIComponent(id); } catch {}  // a malformed hash just matches no project
   const view = document.getElementById("view");
   view.classList.toggle("detail", !!id);
   document.getElementById("stats").innerHTML = id ? "" : globalStats(last);
