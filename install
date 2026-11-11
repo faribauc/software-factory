@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# Link this repo's skills and PRINCIPLES.md into Claude Code and Codex.
+# Whatever a link replaces moves to a timestamped backup; nothing is deleted.
+# Safe to run again.
+set -euo pipefail
+
+REPO=$(cd "$(dirname "$0")" && pwd)
+BACKUP="$HOME/.agents/skills-backup/$(date +%Y%m%d-%H%M%S)"
+# Skills this repo replaces. Moved to the backup if present.
+RETIRED="always-ponytail ponytail babysit-pr council file-pr full-send full-stop leaving-pr-comments modernize sol-loop takeover"
+
+stash() {  # stash <path> <backup subfolder>
+  [ -e "$1" ] || [ -L "$1" ] || return 0
+  mkdir -p "$BACKUP/$2"
+  mv "$1" "$BACKUP/$2/"
+  echo "backed up  $1"
+}
+
+link() {  # link <target> <path> <backup subfolder>
+  [ "$(readlink "$2" 2>/dev/null)" = "$1" ] && return 0
+  stash "$2" "$3"
+  mkdir -p "$(dirname "$2")"
+  ln -s "$1" "$2"
+  echo "linked     $2"
+}
+
+for name in $RETIRED; do
+  [ -d "$REPO/skills/$name" ] && continue  # replaced by a link below
+  stash "$HOME/.claude/skills/$name" claude
+  stash "$HOME/.agents/skills/$name" agents
+done
+
+for dir in "$REPO"/skills/*/; do
+  name=$(basename "$dir")
+  link "$REPO/skills/$name" "$HOME/.claude/skills/$name" claude
+  link "$REPO/skills/$name" "$HOME/.agents/skills/$name" agents
+done
+
+# Claude Code: import the principles from the global CLAUDE.md.
+import="@$REPO/PRINCIPLES.md"
+touch "$HOME/.claude/CLAUDE.md"
+if ! grep -qxF "$import" "$HOME/.claude/CLAUDE.md"; then
+  printf '\n%s\n' "$import" >> "$HOME/.claude/CLAUDE.md"
+  echo "imported   PRINCIPLES.md in ~/.claude/CLAUDE.md"
+fi
+
+# Codex has no imports: its global AGENTS.md is the principles file itself.
+link "$REPO/PRINCIPLES.md" "$HOME/.codex/AGENTS.md" codex
+
+[ -d "$BACKUP" ] && echo "backup in  $BACKUP (move entries back to restore them)"
+echo "done. Start a new session to load the skills."

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Factory</title>
+<style>
+  :root { color-scheme: light dark; --bg: #f6f6f4; --card: #fff; --ink: #1d1d1b; --muted: #6b6b66; --line: #e3e3de;
+          --red: #b42318; --amber: #b54708; --blue: #175cd3; --green: #067647; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #141413; --card: #1e1e1c; --ink: #ececea; --muted: #a0a09a; --line: #33332f;
+            --red: #f97066; --amber: #fdb022; --blue: #84adff; --green: #47cd89; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, sans-serif; }
+  header { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: baseline; padding: 20px 24px 8px; }
+  h1 { font-size: 18px; margin: 0; }
+  .totals { display: flex; flex-wrap: wrap; gap: 6px; }
+  .stamp { margin-left: auto; color: var(--muted); font-size: 12px; }
+  main { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; padding: 12px 24px 32px; }
+  section.project { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; min-width: 0; }
+  section.project.quiet { opacity: .6; }
+  h2 { font-size: 15px; margin: 0; }
+  .repo { color: var(--muted); font-size: 12px; text-decoration: none; }
+  .repo:hover { text-decoration: underline; }
+  h3 { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 14px 0 4px; font-weight: 600; }
+  ul { list-style: none; margin: 0; padding: 0; }
+  li { display: flex; gap: 8px; align-items: baseline; padding: 3px 0; min-width: 0; }
+  li .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  li .meta { color: var(--muted); font-size: 12px; white-space: nowrap; }
+  a { color: inherit; }
+  .chip { font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 99px; border: 1px solid currentColor; white-space: nowrap; }
+  .needs-you, .failure, .error, .changes_requested, .conflicting { color: var(--red); }
+  .failed, .pending, .expected, .ready, .draft { color: var(--amber); }
+  .running { color: var(--blue); }
+  .success, .approved, .done { color: var(--green); }
+  .none, .label { color: var(--muted); }
+  .err { color: var(--red); font-size: 12px; margin-top: 8px; }
+  .empty { color: var(--muted); font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Factory</h1>
+  <div class="totals" id="totals"></div>
+  <div class="stamp" id="stamp" aria-live="polite">loading…</div>
+</header>
+<main id="projects"></main>
+<script>
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"})[c]);
+const chip = (text, cls = text) => `<span class="chip ${esc(cls)}">${esc(text)}</span>`;
+const ago = iso => {
+  const m = Math.round((Date.now() - new Date(iso)) / 60000);
+  return m < 60 ? `${m}m` : m < 1440 ? `${Math.round(m / 60)}h` : `${Math.round(m / 1440)}d`;
+};
+const threadsN = n => `${n} finished thread${n === 1 ? "" : "s"}`;
+const ORDER = ["needs-you", "failed", "running", "ready"];
+const LABEL = {"needs-you": "needs you", failed: "failed", running: "running", ready: "ready"};
+
+function list(title, items, row) {
+  return items.length ? `<h3>${title}</h3><ul>${items.map(row).join("")}</ul>` : "";
+}
+
+function project(p) {
+  const gh = p.github || {};
+  const open = p.threads.filter(t => t.state !== "done")
+    .sort((a, b) => ORDER.indexOf(a.state) - ORDER.indexOf(b.state));
+  const done = p.threads.length - open.length;
+  const prs = gh.prs || [], issues = gh.issues || [], merged = gh.merged || [];
+  const quiet = !open.length && !prs.length && !issues.length;
+  return `<section class="project${quiet ? " quiet" : ""}" aria-label="${esc(p.title)}">
+    <h2>${esc(p.title)}</h2>
+    ${p.repo ? `<a class="repo" href="https://github.com/${esc(p.repo)}">${esc(p.repo)}</a>` : `<span class="repo">${esc(p.root)}</span>`}
+    ${list("Threads", open, t => `<li>${chip(LABEL[t.state], t.state)}<span class="t" title="${esc(t.title)}">${esc(t.title)}</span>
+      ${t.prs.filter(pr => pr.state === "open").map(pr => `<a class="meta" href="${esc(pr.url)}">#${pr.number}</a>`).join("")}
+      <span class="meta">${esc(t.branch || "")} ${ago(t.updated)}</span></li>`)}
+    ${list("Pull requests", prs, pr => `<li>${pr.isDraft ? chip("draft") : chip(pr.checks === "none" ? "no checks" : pr.checks, pr.checks)}
+      ${pr.reviewDecision === "CHANGES_REQUESTED" ? chip("changes", "changes_requested") : pr.reviewDecision === "APPROVED" ? chip("approved") : ""}
+      ${pr.mergeable === "CONFLICTING" ? chip("conflict", "conflicting") : ""}
+      <a class="t" href="${esc(pr.url)}" title="${esc(pr.title)}">#${pr.number} ${esc(pr.title)}</a><span class="meta">${ago(pr.updatedAt)}</span></li>`)}
+    ${list("Issues", issues, i => `<li><a class="t" href="${esc(i.url)}" title="${esc(i.title)}">#${i.number} ${esc(i.title)}</a>
+      ${i.labels.map(l => chip(l, "label")).join("")}</li>`)}
+    ${list("Merged", merged, pr => `<li><a class="t" href="${esc(pr.url)}">#${pr.number} ${esc(pr.title)}</a><span class="meta">${ago(pr.mergedAt)}</span></li>`)}
+    ${quiet ? `<p class="empty">Nothing open.${done ? ` ${threadsN(done)}.` : ""}</p>` : done ? `<p class="empty">${threadsN(done)} hidden.</p>` : ""}
+    ${gh.error ? `<p class="err">GitHub: ${esc(gh.error)}</p>` : ""}
+  </section>`;
+}
+
+async function refresh() {
+  const stamp = document.getElementById("stamp");
+  try {
+    const res = await fetch("/api/state");
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+    const threads = data.projects.flatMap(p => p.threads);
+    const prs = data.projects.flatMap(p => (p.github || {}).prs || []);
+    const count = s => threads.filter(t => t.state === s).length;
+    document.getElementById("totals").innerHTML = [
+      ...ORDER.map(s => count(s) ? chip(`${count(s)} ${LABEL[s]}`, s) : ""),
+      prs.length ? chip(`${prs.length} open PRs`, "none") : "",
+      prs.some(pr => pr.checks === "failure" || pr.checks === "error") ? chip(`${prs.filter(pr => pr.checks === "failure" || pr.checks === "error").length} failing`, "failure") : "",
+    ].join("");
+    document.getElementById("projects").innerHTML = data.projects.map(project).join("");
+    stamp.textContent = `updated ${new Date().toLocaleTimeString()}`;
+  } catch (e) {
+    stamp.textContent = `refresh failed: ${e.message}`;
+  }
+}
+refresh();
+setInterval(refresh, 5000);
+</script>
+</body>
+</html>
