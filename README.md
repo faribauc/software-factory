@@ -51,7 +51,7 @@ The skills create them in a repo when missing.
 ## Dashboard
 
 ```bash
-python3 skills/dashboard/serve.py   # http://127.0.0.1:7420
+cd dashboard && bun install && bun run start   # needs bun and Node 22.13+; http://127.0.0.1:7420
 ```
 
 Every T3 Code project on one page: threads that need you, are running or

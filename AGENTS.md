@@ -13,8 +13,9 @@ change here applies to every project once saved.
 - `skills/<name>/SKILL.md`: one folder per skill (`spec`, `council`, `build`, `ship`,
   `pr`, `dashboard`). Claude Code loads them through the plugin `sf`
   (`.claude-plugin/`) as `/sf:<name>`; Codex through links in `~/.agents/skills`.
-- `skills/dashboard/serve.py`: the dashboard server. `t3_projects()` is the only
-  code that reads T3's internal database.
+- `dashboard/`: the dashboard, a TanStack Start app (bun, Tailwind, shadcn/ui).
+  `t3Projects()` in `src/server/state.ts` is the only code that reads T3's
+  internal database; `src/lib/factory.ts` holds the stage and stats rules.
 - `install`: links skills and principles; backs up whatever it replaces.
 
 ## Conventions
@@ -25,17 +26,19 @@ change here applies to every project once saved.
   Keep one source for each rule; link to it rather than repeating it.
 - Skill frontmatter has only `name` and `description`. The description says
   when to trigger it.
-- Python is standard library only, with no dependencies.
+- The dashboard is the only part with dependencies, managed with bun in
+  `dashboard/`. Add shadcn components with `bunx shadcn@latest add <name>` there.
 - Short one-line commit messages.
 
 ## Setup and validation
 
-No dependencies to install.
+Skills need nothing installed. The dashboard needs bun and Node 22.13 or later.
 
 ```bash
-python3 -B skills/dashboard/test_serve.py   # prints ok
 bash -n install
-python3 skills/dashboard/serve.py           # dashboard on http://127.0.0.1:7420
+cd dashboard && bun install
+bun test && bun run typecheck && bun run build
+bun run dev                                 # dashboard on http://127.0.0.1:7420
 ```
 
 After adding a skill folder, run `./install` again. After editing one, run
