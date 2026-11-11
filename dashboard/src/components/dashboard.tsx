@@ -83,7 +83,7 @@ export function Header({ children }: { children: ReactNode }) {
     <header className="mb-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
       {children}
       <Meta className="ml-auto">
-        {error ? <Status label={`refresh failed: ${error}`} tone="bg-critical" /> : `updated ${updated.toLocaleTimeString()}`}
+        {error ? <Status label={`refresh failed: ${error}`} tone="bg-critical" className="whitespace-normal" /> : `updated ${updated.toLocaleTimeString()}`}
       </Meta>
     </header>
   )
@@ -144,8 +144,8 @@ export function RunsChart({ daily }: { daily: Stats["daily"] }) {
           </div>
         ))}
         {daily.map((d, i) => (
-          <div key={d.date} tabIndex={0} title={`${shortDate(d.date)}: ${plural(d.runs, "run")}`}
-            className="relative flex h-full flex-1 items-end justify-center outline-none hover:bg-muted/60 focus-visible:bg-muted/60">
+          <div key={d.date} title={`${shortDate(d.date)}: ${plural(d.runs, "run")}`}
+            className="relative flex h-full flex-1 items-end justify-center hover:bg-muted/60">
             {d.runs > 0 && (
               <div className="relative w-[min(24px,70%)] rounded-t bg-series" style={{ height: `${(d.runs / top) * 100}%` }}>
                 {d.runs === peak && <span className="absolute bottom-full left-1/2 -translate-x-1/2 pb-0.5 text-[11px] text-muted-foreground">{d.runs}</span>}

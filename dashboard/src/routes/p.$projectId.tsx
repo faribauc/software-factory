@@ -54,7 +54,7 @@ function ProjectView({ p }: { p: Project }) {
       </div>
 
       <Panel title="Issues" meta={p.repo ? `${plural(iss.length, "issue")} tracked` : "not a GitHub repository"} className="mb-3">
-        {error && <p className="mb-2"><Status label={`GitHub: ${error}`} tone="bg-critical" /></p>}
+        {error && <p className="mb-2"><Status label={`GitHub: ${error}`} tone="bg-critical" className="whitespace-normal" /></p>}
         {p.repo && <Flow issues={iss} />}
         {lanes.length > 0 && (
           <div className="mt-3 grid auto-cols-[minmax(220px,300px)] grid-flow-col gap-2.5 overflow-x-auto pb-1">

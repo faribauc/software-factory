@@ -148,15 +148,16 @@ async function github(slug: string): Promise<GitHub> {
   const cached = ghCache.get(slug)
   if (cached && Date.now() - cached.at < GH_TTL) return cached.data
   const [owner, name] = slug.split("/", 2)
-  let stdout: string
+  let repo
   try {
-    ;({ stdout } = await run("gh", ["api", "graphql", "-f", `query=${GH_QUERY}`, "-f", `owner=${owner}`, "-f", `name=${name}`],
-      { timeout: 30_000, maxBuffer: 16 * 1024 * 1024 }))
+    const { stdout } = await run("gh", ["api", "graphql", "-f", `query=${GH_QUERY}`, "-f", `owner=${owner}`, "-f", `name=${name}`],
+      { timeout: 30_000, maxBuffer: 16 * 1024 * 1024 })
+    repo = JSON.parse(stdout).data.repository
+    if (!repo) throw new Error(`no repository ${slug}`)
   } catch (e) {
-    const err = e as { stderr?: string }
-    return { error: err.stderr?.trim().split("\n").at(-1) || "gh failed" } // not cached: retry next poll
+    const err = e as { stderr?: string; message?: string }
+    return { error: err.stderr?.trim().split("\n").at(-1) || err.message || "gh failed" } // not cached: retry next poll
   }
-  const repo = JSON.parse(stdout).data.repository
   const prs: PullRequest[] = repo.open.nodes.map(({ commits, closingIssuesReferences, ...pr }: any) => ({
     ...pr, checks: checks(commits), closes: closingIssuesReferences.nodes.map((i: { number: number }) => i.number),
   }))

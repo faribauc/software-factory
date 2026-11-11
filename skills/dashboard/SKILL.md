@@ -80,6 +80,7 @@ one GraphQL call per repository.
 ## When it breaks
 
 T3's database is internal and can change in an update. Everything that reads it
-is in `t3Projects()` in `dashboard/src/server/state.ts`. If `/api/state` returns an error naming a
-table or column, fix that function against the new schema
+is in `t3Projects()` in `dashboard/src/server/state.ts`. If the page says
+"Couldn't load the dashboard" or "refresh failed" and names a table or column,
+fix that function against the new schema
 (`sqlite3 -readonly ~/.t3/userdata/statev2.sqlite .schema`).
