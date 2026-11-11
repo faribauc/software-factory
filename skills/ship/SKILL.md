@@ -32,14 +32,17 @@ requests, not this workflow. When it's unclear which mode the user meant, use
 1. **Pin the goal.** For an issue, use its spec comment, or run the `spec`
    skill if it has none. For a plain request that fits in one sentence, write
    the goal and two or three acceptance criteria in your first note and go on.
-2. **Get off the default branch.** Work on a new branch. In T3 Code, if this
+2. **Get off the default branch.** Work on a new branch. For an issue, add the
+   `factory:building` label (create it with `gh label create <name> --force` if
+   it's missing). In T3 Code, if this
    thread is in the project's main checkout, move into a worktree with
    `t3_worktree_handoff`, with a `continuationPrompt` that resumes these steps.
 3. **Build** the smallest change that meets the goal (PRINCIPLES.md).
 4. **Prove** every change in the diff (PRINCIPLES.md, "Prove it").
 5. **Validate** with the `council` skill. Prove each fix it leads to.
 6. **File** with the `pr` skill. Rebase onto the latest base first, and put
-   the proof line and the council table in the description.
+   the proof line and the council table in the description. For an issue,
+   remove `factory:building` once the PR is open.
 7. **Watch** with the `pr` skill. Fix real findings and failures, and prove each
    fix before pushing it. Stay active: if you end your turn without a watch
    running, the work stops, because no one will prompt you again.
