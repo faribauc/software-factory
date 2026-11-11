@@ -1,13 +1,19 @@
 ---
 name: ship
-description: Take a change from request or issue to a reviewed pull request, end to end, without the user watching. Use when the user says "ship", "ship it", "full send" or "full stop". Only "full send" allows merging.
+description: Take a change from request or issue to a reviewed pull request, end to end, without the user watching. Use when a message starts with the command "build:" (stop at a ready PR) or "ship:" (merge). Only "ship:" allows merging.
 ---
 
 # Ship
 
 The user isn't watching. You own the work from its current state to a PR that
-is ready (**full stop**, and the default) or merged (**full send**). Messages
-you write along the way go unread until long after you stop.
+is ready (**build**) or merged (**ship**). Messages you write along the way go
+unread until long after you stop.
+
+Each mode starts only from a command at the start of the user's message:
+`build: <request or issue>` or `ship: <request or issue>`. The words used in
+passing ("build a settings page", "let's ship this") are ordinary requests, not
+this skill. When it's unclear which mode the user meant, use **build**: merging
+needs an explicit `ship:`.
 
 ## What the user granted
 
@@ -17,8 +23,8 @@ you write along the way go unread until long after you stop.
   screenshots. That overrides project rules that say to ask before those. It
   doesn't override rules about *how* to test, and doesn't cover production,
   deleting data, other branches, or anything outside the repo.
-- **Full send only:** merge the PR once the merge gate passes.
-- **Full stop:** never merge, enable auto-merge, join a merge queue, or push to
+- **Ship only:** merge the PR once the merge gate passes.
+- **Build:** never merge, enable auto-merge, join a merge queue, or push to
   the default branch. If auto-merge is on, turn it off and say so.
 
 ## Steps
@@ -38,9 +44,9 @@ you write along the way go unread until long after you stop.
    fix before pushing it. Stay active: if you end your turn without a watch
    running, the work stops, because no one will prompt you again.
 8. **Check the merge gate**, below.
-9. **Finish.** Full send: merge with the repo's method (read the allowed
+9. **Finish.** Ship: merge with the repo's method (read the allowed
    methods and recent merges). If it uses a merge queue or auto-merge, stay
-   until GitHub reports the PR merged. Full stop: leave it open and ready.
+   until GitHub reports the PR merged. Build: leave it open and ready.
 10. **Report** in your final message: the PR link, merged commit or final head,
     the proof, the council outcome, every decision you made for the user, and
     what remains unverified.
@@ -58,7 +64,7 @@ All of these must hold on the latest commit:
 - Nothing in the change is on the "A human decides these" list in
   PRINCIPLES.md.
 
-If the last point fails, stop at ready even in full send. Label the issue
+If the last point fails, stop at ready even with ship. Label the issue
 `factory:needs-human` and ask the user, naming the exact decision and the files
 to read. Never merge with `--admin` or any other way around branch protection.
 

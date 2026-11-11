@@ -20,16 +20,16 @@ Run it again after adding a skill.
 ## The flow
 
 ```
-issue ─ spec ─ build ─ checks ─ council ─ pr ─ merge gate ─ merged (full send)
-          │                        ▲  │                    └ ready for you (full stop)
-          └ needs-info / rejected  └──┘ fix, re-prove        └ needs-human (risky change)
+issue ─ spec ─ code ─ checks ─ council ─ pr ─ merge gate ─ merged            (ship:)
+          │                       ▲  │                    └ ready for you    (build:)
+          └ needs-info / rejected └──┘ fix, re-prove      └ needs-human      (risky change)
 ```
 
 | Skill | Use it to |
 | --- | --- |
 | [`spec`](skills/spec/SKILL.md) | Accept, question or reject an issue, rate its risk, and post a spec with testable acceptance criteria. |
 | [`council`](skills/council/SKILL.md) | Validate a change with three models from different providers, in bounded rounds, after the checks pass. |
-| [`ship`](skills/ship/SKILL.md) | Run the whole flow unattended: "full stop" ends at a ready PR, "full send" merges. |
+| [`ship`](skills/ship/SKILL.md) | Run the whole flow unattended: `build: <request>` ends at a ready PR, `ship: <request>` merges. |
 | [`pr`](skills/pr/SKILL.md) | File, watch and update PRs, post comments, revive old PRs, take over unfinished work. |
 | [`dashboard`](skills/dashboard/SKILL.md) | Start the local dashboard. |
 
