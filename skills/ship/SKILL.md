@@ -1,6 +1,6 @@
 ---
 name: ship
-description: Take a change from request or issue to a reviewed pull request, end to end, without the user watching. Use when a message starts with the command "build:" (stop at a ready PR) or "ship:" (merge). Only "ship:" allows merging.
+description: Take a change from request or issue to a merged pull request, end to end, without the user watching. Use only when the user runs the /ship command. The build skill (/build) follows this workflow but stops at a ready PR.
 ---
 
 # Ship
@@ -9,11 +9,10 @@ The user isn't watching. You own the work from its current state to a PR that
 is ready (**build**) or merged (**ship**). Messages you write along the way go
 unread until long after you stop.
 
-Each mode starts only from a command at the start of the user's message:
-`build: <request or issue>` or `ship: <request or issue>`. The words used in
-passing ("build a settings page", "let's ship this") are ordinary requests, not
-this skill. When it's unclear which mode the user meant, use **build**: merging
-needs an explicit `ship:`.
+Each mode starts only from its command: `/build <request or issue>` or
+`/ship <request or issue>`. The words used in passing ("build a settings page",
+"let's ship this") are ordinary requests, not this workflow. When it's unclear
+which mode the user meant, use **build**: merging needs an explicit `/ship`.
 
 ## What the user granted
 

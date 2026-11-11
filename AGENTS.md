@@ -10,7 +10,7 @@ change here applies to every project once saved.
 ## Important paths
 
 - `PRINCIPLES.md`: imported into every Claude Code and Codex session.
-- `skills/<name>/SKILL.md`: one folder per skill (`spec`, `council`, `ship`,
+- `skills/<name>/SKILL.md`: one folder per skill (`spec`, `council`, `build`, `ship`,
   `pr`, `dashboard`), linked into `~/.claude/skills` and `~/.agents/skills`.
 - `skills/dashboard/serve.py`: the dashboard server. `t3_projects()` is the only
   code that reads T3's internal database.
