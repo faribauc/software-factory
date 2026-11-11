@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Link this repo's skills and PRINCIPLES.md into Claude Code and Codex.
+# Install this repo into Claude Code (as the plugin `sf`: /sf:build, /sf:ship...)
+# and Codex (skill links), and load PRINCIPLES.md in both.
 # Whatever a link replaces moves to a timestamped backup; nothing is deleted.
 # Safe to run again.
 set -euo pipefail
@@ -25,16 +26,29 @@ link() {  # link <target> <path> <backup subfolder>
 }
 
 for name in $RETIRED; do
-  [ -d "$REPO/skills/$name" ] && continue  # replaced by a link below
+  [ -d "$REPO/skills/$name" ] && continue  # one of ours, handled below
   stash "$HOME/.claude/skills/$name" claude
   stash "$HOME/.agents/skills/$name" agents
 done
 
 for dir in "$REPO"/skills/*/; do
   name=$(basename "$dir")
-  link "$REPO/skills/$name" "$HOME/.claude/skills/$name" claude
-  link "$REPO/skills/$name" "$HOME/.agents/skills/$name" agents
+  # Claude Code gets these through the plugin; a plain link would add /<name> next to /sf:<name>.
+  if [ "$(readlink "$HOME/.claude/skills/$name" 2>/dev/null)" = "$REPO/skills/$name" ]; then
+    rm "$HOME/.claude/skills/$name"
+    echo "unlinked   $HOME/.claude/skills/$name (now /sf:$name)"
+  fi
+  link "$REPO/skills/$name" "$HOME/.agents/skills/$name" agents  # Codex
 done
+
+# Claude Code: this folder is its own marketplace. Its plugin is read from the
+# folder itself, so an edit here applies after /reload-plugins, with no reinstall.
+if ! claude plugin marketplace list | grep -q 'software-factory'; then
+  claude plugin marketplace add "$REPO"
+fi
+if ! claude plugin list | grep -q 'sf@software-factory'; then
+  claude plugin install sf@software-factory
+fi
 
 # Claude Code: import the principles from the global CLAUDE.md.
 import="@$REPO/PRINCIPLES.md"

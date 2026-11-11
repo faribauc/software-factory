@@ -1,0 +1,5 @@
+{
+  "name": "software-factory",
+  "owner": { "name": "Christophe Faribault" },
+  "plugins": [{ "name": "sf", "source": "./" }]
+}

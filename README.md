@@ -12,16 +12,19 @@ always-on principles, and a local dashboard of every T3 project.
 ./install
 ```
 
-It links each skill into `~/.claude/skills` and `~/.agents/skills`, imports
-`PRINCIPLES.md` from `~/.claude/CLAUDE.md`, and links `~/.codex/AGENTS.md` to
-it. Anything a link replaces moves to `~/.agents/skills-backup/<timestamp>/`.
-Run it again after adding a skill.
+In Claude Code the repo installs as the plugin `sf`, so every skill is a
+`/sf:<name>` command (`/sf:build`, `/sf:council`...). The plugin is read from
+this folder, so an edit applies after `/reload-plugins`. In Codex each skill is
+linked into `~/.agents/skills` and runs as `$<name>`. `PRINCIPLES.md` is
+imported from `~/.claude/CLAUDE.md`, and `~/.codex/AGENTS.md` links to it.
+Anything a link replaces moves to `~/.agents/skills-backup/<timestamp>/`. Run
+it again after adding a skill.
 
 ## The flow
 
 ```
-issue ─ spec ─ code ─ checks ─ council ─ pr ─ merge gate ─ merged            (/ship)
-          │                       ▲  │                    └ ready for you    (/build)
+issue ─ spec ─ code ─ checks ─ council ─ pr ─ merge gate ─ merged            (/sf:ship)
+          │                       ▲  │                    └ ready for you    (/sf:build)
           └ needs-info / rejected └──┘ fix, re-prove      └ needs-human      (risky change)
 ```
 
@@ -29,8 +32,8 @@ issue ─ spec ─ code ─ checks ─ council ─ pr ─ merge gate ─ merged 
 | --- | --- |
 | [`spec`](skills/spec/SKILL.md) | Accept, question or reject an issue, rate its risk, and post a spec with testable acceptance criteria. |
 | [`council`](skills/council/SKILL.md) | Validate a change with three models from different providers, in bounded rounds, after the checks pass. |
-| [`build`](skills/build/SKILL.md) | `/build <request or issue>`: run the whole flow unattended and stop at a ready PR. |
-| [`ship`](skills/ship/SKILL.md) | `/ship <request or issue>`: the same flow, then merge once the merge gate passes. |
+| [`build`](skills/build/SKILL.md) | `/sf:build <request or issue>`: run the whole flow unattended and stop at a ready PR. |
+| [`ship`](skills/ship/SKILL.md) | `/sf:ship <request or issue>`: the same flow, then merge once the merge gate passes. |
 | [`pr`](skills/pr/SKILL.md) | File, watch and update PRs, post comments, revive old PRs, take over unfinished work. |
 | [`dashboard`](skills/dashboard/SKILL.md) | Start the local dashboard. |
 

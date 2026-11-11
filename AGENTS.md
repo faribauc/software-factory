@@ -11,7 +11,8 @@ change here applies to every project once saved.
 
 - `PRINCIPLES.md`: imported into every Claude Code and Codex session.
 - `skills/<name>/SKILL.md`: one folder per skill (`spec`, `council`, `build`, `ship`,
-  `pr`, `dashboard`), linked into `~/.claude/skills` and `~/.agents/skills`.
+  `pr`, `dashboard`). Claude Code loads them through the plugin `sf`
+  (`.claude-plugin/`) as `/sf:<name>`; Codex through links in `~/.agents/skills`.
 - `skills/dashboard/serve.py`: the dashboard server. `t3_projects()` is the only
   code that reads T3's internal database.
 - `install`: links skills and principles; backs up whatever it replaces.
@@ -37,4 +38,5 @@ bash -n install
 python3 skills/dashboard/serve.py           # dashboard on http://127.0.0.1:7420
 ```
 
-After adding a skill folder, run `./install` again.
+After adding a skill folder, run `./install` again. After editing one, run
+`/reload-plugins` in Claude Code.
