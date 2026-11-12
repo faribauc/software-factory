@@ -39,6 +39,7 @@ issue ─ spec ─ code ─ checks ─ council ─ pr ─ merge gate ─ merged 
 | [`build`](skills/build/SKILL.md) | `/sf:build <request or issue>`: run the whole flow unattended and stop at a ready PR. |
 | [`ship`](skills/ship/SKILL.md) | `/sf:ship <request or issue>`: the same flow, then merge once the merge gate passes. |
 | [`pr`](skills/pr/SKILL.md) | File, watch and update PRs, post comments, revive old PRs, take over unfinished work. |
+| [`run`](skills/run/SKILL.md) | Start the current project's dev server, or find where it's already running. |
 | [`dashboard`](skills/dashboard/SKILL.md) | Start the local dashboard. |
 
 [`PRINCIPLES.md`](PRINCIPLES.md) is loaded in every session: build less, prove

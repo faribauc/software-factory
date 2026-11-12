@@ -19,9 +19,9 @@ small while you answer it.
 3. **Pin the change.** `git fetch origin`, then take the base as
    `git merge-base HEAD origin/<default-branch>`. Use the same diff command in
    every round. Write the intent and what's out of scope in two sentences.
-4. **Look at UI changes yourself.** For a `ui` surface, run the app and check
-   the changed pages in the browser at desktop and phone width (T3's preview
-   in T3 Code). Record what you saw, with screenshots where you can, and give
+4. **Look at UI changes yourself.** For a `ui` surface, start the app with the
+   `run` skill and check the changed pages in the browser at desktop and phone
+   width (T3's preview in T3 Code). Record what you saw, with screenshots where you can, and give
    it to the members. They may not have a browser.
 
 ## 2. Seat the council

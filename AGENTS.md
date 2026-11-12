@@ -11,7 +11,7 @@ change here applies to every project once saved.
 
 - `PRINCIPLES.md`: imported into every Claude Code and Codex session.
 - `skills/<name>/SKILL.md`: one folder per skill (`spec`, `council`, `build`, `ship`,
-  `pr`, `dashboard`). Claude Code loads them through the plugin `sf`
+  `pr`, `run`, `dashboard`). Claude Code loads them through the plugin `sf`
   (`.claude-plugin/`) as `/sf:<name>`; Codex through links in `~/.agents/skills`.
 - `dashboard/`: the dashboard, a TanStack Start app (bun, Tailwind, shadcn/ui).
   `t3Projects()` in `src/server/state.ts` is the only code that reads T3's
