@@ -2,7 +2,7 @@ import { Link, createFileRoute } from "@tanstack/react-router"
 import { cn } from "cn"
 import { useEffect } from "react"
 import {
-  Ago, CheckStatus, Dash, Empty, FLOW_LABELS, Flow, Header, Meta, Panel, PrFlags, ProviderSplit, RunsChart, STAGES,
+  Ago, CheckStatus, Dash, Empty, ExtLink, FLOW_LABELS, Flow, Header, Meta, Panel, PrFlags, ProviderSplit, RunsChart, STAGES,
   Spark, Stat, Status, THREAD_ORDER, ThreadStatus, ghError, hasFlags, issuesOf, mergedOf, prsOf,
 } from "@/components/dashboard"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -69,11 +69,11 @@ function ProjectView({ p }: { p: Project }) {
                     const extra = i.labels.filter(l => !FLOW_LABELS.has(l))
                     return (
                       <div key={i.number} className="flex flex-col gap-1.5 rounded-lg bg-card p-2.5 text-sm ring-1 ring-foreground/10">
-                        <a href={i.url} title={i.title} className="line-clamp-3 hover:underline"><Meta>#{i.number}</Meta> {i.title}</a>
+                        <ExtLink href={i.url} title={i.title} className="line-clamp-3"><Meta>#{i.number}</Meta> {i.title}</ExtLink>
                         {(i.pr || i.thread || extra.length > 0) && (
                           <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
                             {i.pr && <>
-                              <a href={i.pr.url} className="text-xs text-muted-foreground hover:underline">PR #{i.pr.number}</a>
+                              <ExtLink href={i.pr.url} className="text-xs text-muted-foreground">PR #{i.pr.number}</ExtLink>
                               <CheckStatus pr={i.pr} /><PrFlags pr={i.pr} />
                             </>}
                             {i.thread && <span title={i.thread.title}><ThreadStatus state={i.thread.state} /></span>}
@@ -105,7 +105,7 @@ function ProjectView({ p }: { p: Project }) {
               {prs.map(pr => (
                 <TableRow key={pr.number}>
                   <TableCell><CheckStatus pr={pr} /></TableCell>
-                  <TableCell className="min-w-[180px] whitespace-normal"><a href={pr.url} className="hover:underline">#{pr.number} {pr.title}</a></TableCell>
+                  <TableCell className="min-w-[180px] whitespace-normal"><ExtLink href={pr.url}>#{pr.number} {pr.title}</ExtLink></TableCell>
                   <TableCell><span className="flex gap-2.5">{hasFlags(pr) ? <PrFlags pr={pr} /> : <Dash />}</span></TableCell>
                   <TableCell className="text-right"><Ago iso={pr.updatedAt} /></TableCell>
                 </TableRow>
@@ -128,7 +128,7 @@ function ProjectView({ p }: { p: Project }) {
                     <TableCell className="min-w-[180px] whitespace-normal">{t.title}</TableCell>
                     <TableCell><Meta>{t.branch ?? "–"}</Meta></TableCell>
                     <TableCell>
-                      {open.length ? open.map(pr => <a key={pr.url} href={pr.url} className="mr-1.5 hover:underline">#{pr.number}</a>) : <Dash />}
+                      {open.length ? open.map(pr => <ExtLink key={pr.url} href={pr.url} className="mr-1.5">#{pr.number}</ExtLink>) : <Dash />}
                     </TableCell>
                     <TableCell className="text-right"><Ago iso={t.updated} /></TableCell>
                   </TableRow>

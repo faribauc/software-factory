@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { cn } from "cn"
 import { useEffect } from "react"
 import {
-  Ago, Dash, Empty, Flow, Header, Meta, Panel, ProjectLink, RunsChart, Spark, Stat, Status, THREAD, ThreadStatus,
+  Ago, Dash, Empty, ExtLink, Flow, Header, Meta, Panel, ProjectLink, RunsChart, Spark, Stat, Status, THREAD, ThreadStatus,
   failing, gh, ghError, issuesOf, mergedOf, prsOf, stageInfo,
 } from "@/components/dashboard"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -79,7 +79,7 @@ function Overview() {
                 <li key={k} className="grid grid-cols-[1fr_auto] items-baseline gap-x-2.5 border-b py-1.5 last:border-0 sm:grid-cols-[96px_1fr_auto]">
                   <Status label={x.kind} tone={x.tone} className="col-span-2 sm:col-span-1" />
                   <span className="min-w-0 truncate text-sm">
-                    {x.url ? <a href={x.url} className="hover:underline">{x.title}</a> : x.title} <Meta>{x.p.title}</Meta>
+                    <ExtLink href={x.url}>{x.title}</ExtLink> <Meta>{x.p.title}</Meta>
                   </span>
                   <Ago iso={x.when} />
                 </li>

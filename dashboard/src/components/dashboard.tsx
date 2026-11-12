@@ -227,4 +227,10 @@ export const ProjectLink = ({ p, children, className }: { p: Project; children: 
   <Link to="/p/$projectId" params={{ projectId: p.id }} className={className}>{children}</Link>
 )
 
+/** A link out of the dashboard. URLs come from GitHub and T3's database: only https ones become links. */
+export const ExtLink = ({ href, title, className, children }: { href?: string; title?: string; className?: string; children: ReactNode }) =>
+  href?.startsWith("https://")
+    ? <a href={href} title={title} className={cn("hover:underline", className)}>{children}</a>
+    : <span title={title} className={className}>{children}</span>
+
 export const Ago = ({ iso, prefix }: { iso: string; prefix?: string }) => <Meta>{prefix}{ago(iso)}{prefix ? " ago" : ""}</Meta>
