@@ -134,11 +134,11 @@ function t3Projects() {
 async function githubSlug(root: string) {
   if (!existsSync(root)) return null
   try {
-    const { stdout } = await run("git", ["-C", root, "remote", "get-url", "origin"])
+    const { stdout } = await run("git", ["-C", root, "remote", "get-url", "origin"], { timeout: 5_000 })
     const m = stdout.trim().match(/github\.com[:/]([^/]+)\/(.+?)(?:\.git)?\/?$/)
     return m ? `${m[1]}/${m[2]}` : null
   } catch {
-    return null // no origin remote
+    return null // no origin remote, or git hung
   }
 }
 
@@ -148,31 +148,35 @@ async function github(slug: string): Promise<GitHub> {
   const cached = ghCache.get(slug)
   if (cached && Date.now() - cached.at < GH_TTL) return cached.data
   const [owner, name] = slug.split("/", 2)
-  let repo
   try {
     const { stdout } = await run("gh", ["api", "graphql", "-f", `query=${GH_QUERY}`, "-f", `owner=${owner}`, "-f", `name=${name}`],
       { timeout: 30_000, maxBuffer: 16 * 1024 * 1024 })
-    repo = JSON.parse(stdout).data.repository
+    const repo = JSON.parse(stdout).data.repository
     if (!repo) throw new Error(`no repository ${slug}`)
-  } catch (e) {
-    const err = e as { stderr?: string; message?: string }
-    return { error: err.stderr?.trim().split("\n").at(-1) || err.message || "gh failed" } // not cached: retry next poll
+    const prs: PullRequest[] = repo.open.nodes.map(({ commits, closingIssuesReferences, ...pr }: any) => ({
+      ...pr, checks: checks(commits), closes: closingIssuesReferences.nodes.map((i: { number: number }) => i.number),
+    }))
+    const closer = new Map(prs.flatMap(pr => pr.closes.map(n => [n, pr] as const)))
+    const issues: Issue[] = [...repo.issues.nodes, ...repo.closed.nodes].map(({ labels: l, ...i }: any) => {
+      const labels: string[] = l.nodes.map((x: { name: string }) => x.name)
+      const pr = i.closedAt ? undefined : closer.get(i.number)
+      return {
+        ...i, labels, stage: issueStage(labels, Boolean(i.closedAt), Boolean(pr)), thread: null,
+        pr: pr ? { number: pr.number, url: pr.url, isDraft: pr.isDraft, checks: pr.checks, reviewDecision: pr.reviewDecision, mergeable: pr.mergeable } : null,
+      }
+    })
+    const data: GitHub = { issues, prs, merged: repo.merged.nodes }
+    ghCache.set(slug, { at: Date.now(), data })
+    return data
+  } catch (e) { // not cached: retry next poll
+    const err = e as { killed?: boolean; code?: unknown; stderr?: string; message?: string }
+    const error = err.killed ? "gh timed out after 30s"
+      : err.code === "ENOENT" ? "gh is not installed"
+      : e instanceof TypeError ? "unexpected response from GitHub" // a field the mapping needs is missing
+      // a failed command's message repeats the whole command line, query included
+      : err.stderr?.trim().split("\n").at(-1) || (err.message?.startsWith("Command failed") ? `gh exited with code ${err.code}` : err.message)
+    return { error: error || "gh failed" }
   }
-  const prs: PullRequest[] = repo.open.nodes.map(({ commits, closingIssuesReferences, ...pr }: any) => ({
-    ...pr, checks: checks(commits), closes: closingIssuesReferences.nodes.map((i: { number: number }) => i.number),
-  }))
-  const closer = new Map(prs.flatMap(pr => pr.closes.map(n => [n, pr] as const)))
-  const issues: Issue[] = [...repo.issues.nodes, ...repo.closed.nodes].map(({ labels: l, ...i }: any) => {
-    const labels: string[] = l.nodes.map((x: { name: string }) => x.name)
-    const pr = i.closedAt ? undefined : closer.get(i.number)
-    return {
-      ...i, labels, stage: issueStage(labels, Boolean(i.closedAt), Boolean(pr)), thread: null,
-      pr: pr ? { number: pr.number, url: pr.url, isDraft: pr.isDraft, checks: pr.checks, reviewDecision: pr.reviewDecision, mergeable: pr.mergeable } : null,
-    }
-  })
-  const data: GitHub = { issues, prs, merged: repo.merged.nodes }
-  ghCache.set(slug, { at: Date.now(), data })
-  return data
 }
 
 export async function buildState(): Promise<State> {

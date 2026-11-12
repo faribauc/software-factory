@@ -48,13 +48,23 @@ export function Page({ children }: { children: ReactNode }) {
   return <div className="mx-auto max-w-[1320px] px-3.5 pt-4 pb-8 sm:px-6 sm:pt-5 sm:pb-10">{children}</div>
 }
 
-/** The first load failed: say why, and try again on the refresh interval. */
+/** Fetches the state every 5 seconds, one call at a time: a slow `gh` call must not stack them. */
+function usePoll(onState: (s: State) => void, onError: (e: Error) => void) {
+  useEffect(() => {
+    let busy = false
+    const id = setInterval(() => {
+      if (busy) return
+      busy = true
+      getState().then(onState, onError).finally(() => { busy = false })
+    }, REFRESH)
+    return () => clearInterval(id)
+  }, [])
+}
+
+/** The first load failed: say why, and reload once a quiet retry succeeds (reloading on every try flashes "Loading…"). */
 function LoadError({ error }: { error: unknown }) {
   const router = useRouter()
-  useEffect(() => {
-    const id = setInterval(() => router.invalidate(), REFRESH)
-    return () => clearInterval(id)
-  }, [router])
+  usePoll(() => router.invalidate(), () => {})
   return (
     <Page>
       <h1 className="text-xl font-semibold">Factory</h1>
@@ -68,18 +78,10 @@ function LoadError({ error }: { error: unknown }) {
 function Root() {
   const initial = Route.useLoaderData()
   const [live, setLive] = useState<Live>({ state: initial, updated: new Date(), error: null })
-  useEffect(() => {
-    let busy = false // a slow `gh` call must not stack refreshes
-    const id = setInterval(() => {
-      if (busy) return
-      busy = true
-      getState().then(
-        state => setLive({ state, updated: new Date(), error: null }),
-        (e: Error) => setLive(l => ({ ...l, error: e.message })),
-      ).finally(() => { busy = false })
-    }, REFRESH)
-    return () => clearInterval(id)
-  }, [])
+  usePoll(
+    state => setLive({ state, updated: new Date(), error: null }),
+    e => setLive(l => ({ ...l, error: e.message })),
+  )
   return (
     <LiveState.Provider value={live}>
       <Page><Outlet /></Page>
