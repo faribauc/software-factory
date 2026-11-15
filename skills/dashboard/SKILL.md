@@ -26,6 +26,14 @@ If that doesn't print `200`, start it as a long-running background command:
 cd "$(realpath <this skill's directory>)/../../dashboard" && bun install && bun run start
 ```
 
+If there's no `dashboard/` there, the skill was installed on its own (with
+`npx skills`). Clone the repository once and start it from the clone:
+
+```bash
+[ -d ~/.software-factory ] || git clone https://github.com/faribauc/software-factory ~/.software-factory
+cd ~/.software-factory/dashboard && bun install && bun run start
+```
+
 `bun run start` builds the app and serves it. For work on the dashboard itself,
 `bun run dev` serves the same port with hot reload.
 

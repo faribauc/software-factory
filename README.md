@@ -24,6 +24,20 @@ T3 Code caches each provider's commands. After installing, or adding or
 renaming a skill, refresh the providers in T3's settings (or restart T3) before
 the new commands show up in its `/` menu.
 
+### With `npx skills`
+
+```bash
+npx skills add https://github.com/faribauc/software-factory
+```
+
+This copies the skills into each agent you pick, as plain `/<name>` commands
+(`/build`, `/council`...) rather than `/sf:<name>`, so use it instead of
+`./install`, not alongside it. It installs only the skills: add `PRINCIPLES.md`
+to your agent's global instructions yourself, and the `dashboard` skill clones
+this repo into `~/.software-factory` the first time it runs. Install `build`
+together with `ship`, which it follows. The repo is private, so this needs git
+access to it.
+
 ## The flow
 
 ```
