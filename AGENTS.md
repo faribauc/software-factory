@@ -13,6 +13,9 @@ change here applies to every project once saved.
 - `skills/<name>/SKILL.md`: one folder per skill (`spec`, `council`, `build`, `ship`,
   `pr`, `dashboard`). Claude Code loads them through the plugin `sf`
   (`.claude-plugin/`) as `/sf:<name>`; Codex through links in `~/.agents/skills`.
+- `SKILL.md`: the skill `sf`, which `npx skills add` installs as the whole repo
+  and which routes `/sf <command>` to `skills/<command>/SKILL.md`. List a new
+  skill in its table.
 - `dashboard/`: the dashboard, a TanStack Start app (bun, Tailwind, shadcn/ui).
   `t3Projects()` in `src/server/state.ts` is the only code that reads T3's
   internal database; `src/lib/factory.ts` holds the stage and stats rules.
