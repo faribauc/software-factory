@@ -1,6 +1,6 @@
 ---
 name: ship
-description: Take a change from request or issue to a merged pull request, end to end, without the user watching. Use only when the user runs the ship command (/sf:ship in Claude Code, $ship in Codex). The build skill follows this workflow but stops at a ready PR.
+description: Take a change from request or issue to a merged pull request, end to end, without the user watching. Use only when the user runs the ship command (/sf:ship or /ship in Claude Code, $ship in Codex). The build skill follows this workflow but stops at a ready PR.
 ---
 
 # Ship

@@ -1,6 +1,6 @@
 ---
 name: build
-description: Take a change from request or issue to a reviewed pull request that is ready for the user to merge, end to end, without the user watching. Use only when the user runs the build command (/sf:build in Claude Code, $build in Codex). Never merges.
+description: Take a change from request or issue to a reviewed pull request that is ready for the user to merge, end to end, without the user watching. Use only when the user runs the build command (/sf:build or /build in Claude Code, $build in Codex). Never merges.
 ---
 
 # Build
