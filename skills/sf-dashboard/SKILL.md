@@ -1,5 +1,5 @@
 ---
-name: dashboard
+name: sf-dashboard
 description: Start or open the local dashboard of every T3 Code project's threads, pull requests and issues. Use when the user asks for the dashboard, the board, or an overview of what's running or waiting across projects.
 ---
 
@@ -24,6 +24,14 @@ If that doesn't print `200`, start it as a long-running background command:
 
 ```bash
 cd "$(realpath <this skill's directory>)/../../dashboard" && bun install && bun run start
+```
+
+If there's no `dashboard/` there, the skill was installed on its own (with
+`npx skills`). Clone the repository once and start it from the clone:
+
+```bash
+[ -d ~/.software-factory ] || git clone https://github.com/faribauc/software-factory ~/.software-factory
+cd ~/.software-factory/dashboard && git pull -q --ff-only && bun install && bun run start
 ```
 
 `bun run start` builds the app and serves it. For work on the dashboard itself,

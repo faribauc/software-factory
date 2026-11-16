@@ -1,6 +1,6 @@
 ---
-name: council
-description: Validate a change with a council of three strong models from different providers, reviewing in parallel in bounded rounds. Use when the user says "council", asks for a review, validation or second opinion on a change, or when the ship skill reaches its review step.
+name: sf-council
+description: Validate a change with a council of three strong models from different providers, reviewing in parallel in bounded rounds. Use when the user says "council", asks for a review, validation or second opinion on a change, or when the sf-ship skill reaches its review step.
 ---
 
 # Council

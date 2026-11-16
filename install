@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
-# Install this repo into Claude Code (as the plugin `sf`: /sf:build, /sf:ship...)
-# and Codex (skill links), and load PRINCIPLES.md in both.
+# Install this repo into Claude Code and Codex from a checkout: link each skill
+# (/sf-build, $sf-build...), so edits apply in the next session, and load
+# PRINCIPLES.md in both. Without a checkout, use `npx skills add <repo URL>`.
 # Whatever a link replaces moves to a timestamped backup; nothing is deleted.
 # Safe to run again.
 set -euo pipefail
 
 REPO=$(cd "$(dirname "$0")" && pwd)
 BACKUP="$HOME/.agents/skills-backup/$(date +%Y%m%d-%H%M%S)"
-# Skills this repo replaces. Moved to the backup if present.
-RETIRED="always-ponytail ponytail babysit-pr council file-pr full-send full-stop leaving-pr-comments modernize sol-loop takeover"
+# Skills this repo replaces, and its own names before the sf- prefix. Moved to
+# the backup if present.
+RETIRED="always-ponytail ponytail babysit-pr council file-pr full-send full-stop leaving-pr-comments modernize sol-loop takeover
+spec build ship pr dashboard saas"
 
 stash() {  # stash <path> <backup subfolder>
   [ -e "$1" ] || [ -L "$1" ] || return 0
@@ -33,21 +36,19 @@ done
 
 for dir in "$REPO"/skills/*/; do
   name=$(basename "$dir")
-  # Claude Code gets these through the plugin; a plain link would add /<name> next to /sf:<name>.
-  if [ "$(readlink "$HOME/.claude/skills/$name" 2>/dev/null)" = "$REPO/skills/$name" ]; then
-    rm "$HOME/.claude/skills/$name"
-    echo "unlinked   $HOME/.claude/skills/$name (now /sf:$name)"
-  fi
+  link "$REPO/skills/$name" "$HOME/.claude/skills/$name" claude  # Claude Code
   link "$REPO/skills/$name" "$HOME/.agents/skills/$name" agents  # Codex
 done
 
-# Claude Code: this folder is its own marketplace. Its plugin is read from the
-# folder itself, so an edit here applies after /reload-plugins, with no reinstall.
-if ! claude plugin marketplace list | grep -q 'software-factory'; then
-  claude plugin marketplace add "$REPO"
-fi
-if ! claude plugin list | grep -q 'sf@software-factory'; then
-  claude plugin install sf@software-factory
+# The skills used to be the Claude Code plugin `sf` (/sf:<name>). Remove it so
+# each command isn't listed twice.
+if command -v claude >/dev/null; then
+  if claude plugin list 2>/dev/null | grep -q 'sf@software-factory'; then
+    claude plugin uninstall sf@software-factory && echo "removed    plugin sf"
+  fi
+  if claude plugin marketplace list 2>/dev/null | grep -q 'software-factory'; then
+    claude plugin marketplace remove software-factory && echo "removed    marketplace software-factory"
+  fi
 fi
 
 # Claude Code: import the principles from the global CLAUDE.md.

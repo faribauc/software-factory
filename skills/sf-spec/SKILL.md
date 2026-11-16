@@ -1,5 +1,5 @@
 ---
-name: spec
+name: sf-spec
 description: Turn a GitHub issue or a feature request into an accepted, scoped spec with testable acceptance criteria. Use when the user asks to spec, triage, scope or plan an issue or feature, or says "intake".
 ---
 
@@ -83,7 +83,7 @@ Mark any that is really a product decision; that change goes to a human.
 
 ## 5. Post it
 
-Post on the issue with the comment format from the `pr` skill. Then set labels,
+Post on the issue with the comment format from the `sf-pr` skill. Then set labels,
 creating any that are missing with `gh label create <name> --force`:
 
 | Decision | Comment | Labels |
