@@ -104,7 +104,7 @@ ignore and a line in `docs/testing.md` saying why.
 
 `prepare` runs `vp hooks enable`: the pre-commit hook runs `vp staged`, the
 pre-push hook runs `verify`. The end-to-end suite
-uses ports from 4300 so it never collides with the user's dev servers.
+uses ports from 4300 so it never collides with the dev servers.
 
 ## CI
 

@@ -108,14 +108,19 @@ After approval, and only then:
 2. Scaffold with the official CLIs (TanStack Start, shadcn, Storybook), never
    hand-written boilerplate. Read the `tanstack-router`, `vite` and `workos`
    skills first when installed.
-3. Build the skeleton from `repo.md`: the monorepo layout, Bun workspaces,
+3. Start the dev server the moment the first app scaffolds, in the background
+   on its fixed port (`repo.md`), and give the user its URL. Start each app's
+   server as it lands, and keep them all running while you build the rest.
+   Vite reloads code changes by itself. After a change it can't (dependencies,
+   env, Vite or workspace config), restart that server and reload the page.
+4. Build the skeleton from `repo.md`: the monorepo layout, Bun workspaces,
    Vite+ (`vp check`, `vp test`, `vp run`, with the `vite` override TanStack
    Start needs), TypeScript, the product config package, the env module and
    `.env.example`, `verify` and the git hooks, CI, the docs from step 2 plus
    `AGENTS.md`, `CONTEXT.md`, `docs/README.md` and `docs:check`, the test kit's
    guards (`testing.md`), an empty design system with Storybook (`ui.md`), and
    `.railway/railway.ts` describing the services (not applied).
-4. Run `verify` until it's green. Commit with short messages and push to
+5. Run `verify` until it's green. Commit with short messages and push to
    `main`. Protect `main`: pull requests required and CI must pass.
 
 Never create provider accounts, Railway projects or Turso databases, never
@@ -132,7 +137,8 @@ must read; the builder reads them from this skill.
 
 ## 5. Report
 
-Lead with the repository URL and the T3 project. Then the decisions that
+Lead with the repository URL, the T3 project and the running dev servers'
+URLs. Then the decisions that
 differ from the user's defaults and why, the issues in order with links, the
 setup steps waiting for the user (accounts, keys, Railway, Turso, domain), and
 anything you couldn't verify.
@@ -155,6 +161,8 @@ Each reference has its own area's rules. These hold everywhere:
 - **Hosts are allow-listed** on every server with a public hostname.
 - **Tests never touch the network or a real provider.**
 - **WCAG 2.2 AA**: labels, keyboard use, focus, contrast, reduced motion.
-- **Agents never deploy, create provider accounts, or start or stop the user's
-  dev servers** unless asked.
+- **Agents never deploy or create provider accounts** unless asked.
+- **The dev servers stay up.** An agent starts one that isn't running as early
+  as the work allows, restarts it after a change it can't hot-reload, and
+  never leaves one stopped.
 - **Left-out work goes in `docs/roadmap.md`**, not as stubs in the code.
