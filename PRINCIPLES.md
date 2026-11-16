@@ -61,6 +61,18 @@ Stop and ask before merging, even when every check passes, if the change:
 - adds a dependency;
 - rests on an assumption that is really a product or business decision.
 
+## Ask the question itself
+
+When you need something from the user, write out the exact question. Never
+stop at "I have a few questions" or "let me know what you think".
+
+- Ask with the harness's question tool (`AskUserQuestion` in Claude Code,
+  `request_user_input` in Codex). A question inside a normal message is easy
+  to miss, and the thread looks finished. With no tool, put the questions
+  first in your message.
+- Make each question stand on its own: what is being decided, why it blocks
+  you, and the options, your recommendation first.
+
 ## Report plainly
 
 Lead with the outcome. Separate what you verified from what you judged, and
