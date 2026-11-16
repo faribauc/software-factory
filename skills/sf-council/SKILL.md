@@ -75,6 +75,8 @@ You lead on <this seat's lens>: go deepest there, and still report anything else
 Severity: blocker = the intended case is wrong. should = a real bug callers will
 hit, within the intent. nit = everything else (other paths, rare cases, small
 costs, style).
+Approve only at a score of 9 or higher. Below 9, your findings must say what
+keeps it there.
 Reply in this format:
 SCORE: <0-10>
 VERDICT: APPROVE or CHANGES
@@ -122,13 +124,14 @@ change, cut it back before the next round. Don't agree just to end the loop.
 - **Budget:** three rounds. Up to five when a blocker or should on security,
   auth, data loss or concurrency is still open with evidence, or when the user
   asks.
-- **Next round** only when a blocker or should is open, or behaviour changed
-  since the last approval. Send a fresh brief to every member, plus the ledger
-  and what changed since their last round, and ask them to mark each of their
-  earlier ids `resolved` or `still open: <why>`.
-- **Stop early** when a round brings only nits.
-- **Done:** every member approves the current diff, and no blocker or should is
-  open.
+- **Next round** only when a blocker or should is open, a member scored below
+  9, or behaviour changed since the last approval. Send a fresh brief to every
+  member, plus the ledger and what changed since their last round, and ask them
+  to mark each of their earlier ids `resolved` or `still open: <why>`.
+- **Stop early** when a round brings only nits and every member scored 9 or
+  higher.
+- **Done:** every member approves the current diff with a score of 9 or higher,
+  and no blocker or should is open. A member who gave no score hasn't approved.
 - **Stuck:** a finding is still disputed after two exchanges, or the budget runs
   out. Running out of budget is not approval. Put both sides in two or three lines
   each and let the user decide.
