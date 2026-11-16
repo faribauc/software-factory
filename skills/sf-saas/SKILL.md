@@ -13,8 +13,9 @@ its own needs instead of copied from a template.
 
 The command has two modes:
 
-- **New product** (run outside a product repo, or the user says so): interview,
-  decisions doc, skeleton, issues.
+- **New product** (run outside a product repo, or the user says so): project,
+  interview, decisions doc, skeleton, issues. A folder holding only what step 0
+  created (a README and an icon) is a new product, not a repo to add to.
 - **Add a piece** (run inside a product repo): read its `AGENTS.md` and docs,
   interview only about the piece, then file its issues. The product's own
   decisions win over these defaults; where they differ, say so and ask.
@@ -41,6 +42,27 @@ Read the one you need when you need it.
 | [deploy-aws.md](references/deploy-aws.md) | The move to AWS when a product outgrows Railway |
 | [issues.md](references/issues.md) | The foundation issue catalogue, its order and what each issue's spec holds |
 
+## 0. Project
+
+In T3 Code, the product gets its own T3 project first, and everything after
+this step runs in a thread there, so its threads, PRs and issues sit together
+on the dashboard from the start.
+
+1. Ask only the product's name and the paragraph from interview round 1:
+   who it's for, what they do with it, what success looks like.
+2. Create the project with `t3_project_create`, titled with the name and no
+   `workspaceRoot`: T3 makes the folder as a git repo with a README, an icon
+   and a first commit. If a project of that name exists, ask before going on.
+3. Launch a thread in it with `t3_thread_launch` (the new `projectId`,
+   `workspaceStrategy: { type: "root" }`, titled "<name>: SaaS interview"). Its
+   message runs `/sf-saas` (`$sf-saas` for Codex) and carries the name and the
+   paragraph, saying the project was just created so the interview picks up at
+   round 1's remaining questions.
+4. Give the user the thread's `link` and stop. This thread's work is done.
+
+Outside T3 Code, skip this step: create a folder named after the slug, run
+`git init` in it, and work there.
+
 ## 1. Interview
 
 Follow `interview.md`. Ask in rounds of three or four questions, grouped by
@@ -62,8 +84,8 @@ when it wins, with your recommendation first.
 
 ## 2. Decisions doc
 
-Write the outcome as the product's first docs, in a scratch folder until the
-repo exists:
+Write the outcome as the product's first docs, in the project folder,
+uncommitted until the user approves:
 
 - `PRODUCT.md`: users, purpose, brand personality, anti-references, design
   principles, accessibility (`docs-system.md`).
@@ -80,8 +102,9 @@ it as many times as they ask.
 
 After approval, and only then:
 
-1. Create the GitHub repository, **private**, under the owner the user named
-   (`gh repo create`).
+1. Create the GitHub repository, **private**, under the owner the user named,
+   from the project folder: `gh repo create <owner>/<slug> --private
+   --source . --remote origin`.
 2. Scaffold with the official CLIs (TanStack Start, shadcn, Storybook), never
    hand-written boilerplate. Read the `tanstack-router`, `vite` and `workos`
    skills first when installed.
@@ -94,8 +117,6 @@ After approval, and only then:
    `.railway/railway.ts` describing the services (not applied).
 4. Run `verify` until it's green. Commit with short messages and push to
    `main`. Protect `main`: pull requests required and CI must pass.
-5. Register the repo as a T3 Code project (`t3_project_create`), so it shows on
-   the dashboard.
 
 Never create provider accounts, Railway projects or Turso databases, never
 deploy, and never put a secret in a file. Those steps go in the setup checklist
