@@ -1,5 +1,5 @@
 ---
-name: pr
+name: sf-pr
 description: File, watch and update GitHub pull requests, and post comments on the user's behalf. Use when the user asks to open, file, watch, babysit, rebase, revive or take over a PR, branch or agent thread, or whenever you post a GitHub comment.
 ---
 
@@ -7,7 +7,7 @@ description: File, watch and update GitHub pull requests, and post comments on t
 
 Everything about a pull request after the code exists: opening it, getting it
 through CI and review, keeping it current, and picking up someone else's.
-Merging belongs to the `ship` skill or an explicit request from the user.
+Merging belongs to the `sf-ship` skill or an explicit request from the user.
 
 ## File
 

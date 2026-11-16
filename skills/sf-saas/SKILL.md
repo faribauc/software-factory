@@ -1,6 +1,6 @@
 ---
-name: saas
-description: Interview the user about a SaaS product they have in mind, challenging each tech decision against their usual stack, then create its repository skeleton and file ordered, accepted foundation issues for the build and ship skills. Inside an existing product, add a missing foundation piece the same way. Use only when the user runs the saas command: /sf:saas in Claude Code, $saas in Codex.
+name: sf-saas
+description: Interview the user about a SaaS product they have in mind, challenging each tech decision against their usual stack, then create its repository skeleton and file ordered, accepted foundation issues for the sf-build and sf-ship skills. Inside an existing product, add a missing foundation piece the same way. Use only when the user runs /sf-saas in Claude Code or $sf-saas in Codex.
 ---
 
 # SaaS
@@ -104,9 +104,9 @@ for the user (`docs-system.md`).
 ## 4. Issues
 
 File the issues from the plan with `issues.md`. Each gets a short request as
-its body, then a spec comment in the `spec` skill's format, posted with the
-`pr` skill's comment line, and the `factory` label, so `/sf:build` and
-`/sf:ship` can take them in order. Every spec names the references its builder
+its body, then a spec comment in the `sf-spec` skill's format, posted with the
+`sf-pr` skill's comment line, and the `factory` label, so `/sf-build` and
+`/sf-ship` can take them in order. Every spec names the references its builder
 must read; the builder reads them from this skill.
 
 ## 5. Report

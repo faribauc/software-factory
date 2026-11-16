@@ -1,6 +1,6 @@
 ---
-name: ship
-description: Take a change from request or issue to a merged pull request, end to end, without the user watching. Use only when the user runs the ship command: /sf:ship in Claude Code, $ship in Codex. The build skill follows this workflow but stops at a ready PR.
+name: sf-ship
+description: Take a change from request or issue to a merged pull request, end to end, without the user watching. Use only when the user runs /sf-ship in Claude Code or $sf-ship in Codex. The sf-build skill follows this workflow but stops at a ready PR.
 ---
 
 # Ship
@@ -9,8 +9,8 @@ The user isn't watching. You own the work from its current state to a PR that
 is ready (**build**) or merged (**ship**). Messages you write along the way go
 unread until long after you stop.
 
-Each mode starts only from its command: `/sf:build` or `/sf:ship` in Claude
-Code, `$build` or `$ship` in Codex, followed by a request or an issue. The words
+Each mode starts only from its command: `/sf-build` or `/sf-ship` in Claude
+Code, `$sf-build` or `$sf-ship` in Codex, followed by a request or an issue. The words
 used in passing ("build a settings page", "let's ship this") are ordinary
 requests, not this workflow. When it's unclear which mode the user meant, use
 **build**: merging needs an explicit ship command.
@@ -29,7 +29,7 @@ requests, not this workflow. When it's unclear which mode the user meant, use
 
 ## Steps
 
-1. **Pin the goal.** For an issue, use its spec comment, or run the `spec`
+1. **Pin the goal.** For an issue, use its spec comment, or run the `sf-spec`
    skill if it has none. For a plain request that fits in one sentence, write
    the goal and two or three acceptance criteria in your first note and go on.
 2. **Get off the default branch.** Work on a new branch. For an issue, add the
@@ -39,11 +39,11 @@ requests, not this workflow. When it's unclear which mode the user meant, use
    `t3_worktree_handoff`, with a `continuationPrompt` that resumes these steps.
 3. **Build** the smallest change that meets the goal (PRINCIPLES.md).
 4. **Prove** every change in the diff (PRINCIPLES.md, "Prove it").
-5. **Validate** with the `council` skill. Prove each fix it leads to.
-6. **File** with the `pr` skill. Rebase onto the latest base first, and put
+5. **Validate** with the `sf-council` skill. Prove each fix it leads to.
+6. **File** with the `sf-pr` skill. Rebase onto the latest base first, and put
    the proof line and the council table in the description. For an issue,
    remove `factory:building` once the PR is open.
-7. **Watch** with the `pr` skill. Fix real findings and failures, and prove each
+7. **Watch** with the `sf-pr` skill. Fix real findings and failures, and prove each
    fix before pushing it. Stay active: if you end your turn without a watch
    running, the work stops, because no one will prompt you again.
 8. **Check the merge gate**, below.

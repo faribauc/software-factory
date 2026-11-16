@@ -9,16 +9,27 @@ always-on principles, and a local dashboard of every T3 project.
 ## Install
 
 ```bash
+npx skills add https://github.com/faribauc/software-factory -g
+```
+
+Pick the skills and the agents (Claude Code, Codex...). Each skill installs as
+its own command: `/sf-build`, `/sf-ship`... in Claude Code, `$sf-build`,
+`$sf-ship`... in Codex. Install `sf-build` together with `sf-ship`, which it
+follows. The repo is private, so this needs git access to it. `npx skills`
+installs only skills: add `PRINCIPLES.md` to your agent's global instructions
+yourself. `npx skills update -g` pulls new versions.
+
+To work on the skills, install from a checkout instead:
+
+```bash
 ./install
 ```
 
-In Claude Code the repo installs as the plugin `sf`, so every skill is a
-`/sf:<name>` command (`/sf:build`, `/sf:council`...). The plugin is read from
-this folder, so an edit applies after `/reload-plugins`. In Codex each skill is
-linked into `~/.agents/skills` and runs as `$<name>`. `PRINCIPLES.md` is
-imported from `~/.claude/CLAUDE.md`, and `~/.codex/AGENTS.md` links to it.
-Anything a link replaces moves to `~/.agents/skills-backup/<timestamp>/`. Run
-it again after adding a skill.
+It links each skill into `~/.claude/skills` and `~/.agents/skills`, so an edit
+here applies in the next session, and loads `PRINCIPLES.md`: imported from
+`~/.claude/CLAUDE.md`, and `~/.codex/AGENTS.md` links to it. Anything a link
+replaces moves to `~/.agents/skills-backup/<timestamp>/`. Run it again after
+adding or renaming a skill. Use one way or the other, not both.
 
 T3 Code caches each provider's commands. After installing, or adding or
 renaming a skill, refresh the providers in T3's settings (or restart T3) before
@@ -27,19 +38,20 @@ the new commands show up in its `/` menu.
 ## The flow
 
 ```
-issue ─ spec ─ code ─ checks ─ council ─ pr ─ merge gate ─ merged            (/sf:ship)
-          │                       ▲  │                    └ ready for you    (/sf:build)
+issue ─ spec ─ code ─ checks ─ council ─ pr ─ merge gate ─ merged            (/sf-ship)
+          │                       ▲  │                    └ ready for you    (/sf-build)
           └ needs-info / rejected └──┘ fix, re-prove      └ needs-human      (risky change)
 ```
 
 | Skill | Use it to |
 | --- | --- |
-| [`spec`](skills/spec/SKILL.md) | Accept, question or reject an issue, rate its risk, and post a spec with testable acceptance criteria. |
-| [`council`](skills/council/SKILL.md) | Validate a change with three models from different providers, in bounded rounds, after the checks pass. |
-| [`build`](skills/build/SKILL.md) | `/sf:build <request or issue>`: run the whole flow unattended and stop at a ready PR. |
-| [`ship`](skills/ship/SKILL.md) | `/sf:ship <request or issue>`: the same flow, then merge once the merge gate passes. |
-| [`pr`](skills/pr/SKILL.md) | File, watch and update PRs, post comments, revive old PRs, take over unfinished work. |
-| [`dashboard`](skills/dashboard/SKILL.md) | Start the local dashboard. |
+| [`sf-spec`](skills/sf-spec/SKILL.md) | Accept, question or reject an issue, rate its risk, and post a spec with testable acceptance criteria. |
+| [`sf-council`](skills/sf-council/SKILL.md) | Validate a change with three models from different providers, in bounded rounds, after the checks pass. |
+| [`sf-build`](skills/sf-build/SKILL.md) | `/sf-build <request or issue>`: run the whole flow unattended and stop at a ready PR. |
+| [`sf-ship`](skills/sf-ship/SKILL.md) | `/sf-ship <request or issue>`: the same flow, then merge once the merge gate passes. |
+| [`sf-pr`](skills/sf-pr/SKILL.md) | File, watch and update PRs, post comments, revive old PRs, take over unfinished work. |
+| [`sf-dashboard`](skills/sf-dashboard/SKILL.md) | Start the local dashboard. |
+| [`sf-saas`](skills/sf-saas/SKILL.md) | `/sf-saas`: interview you about a SaaS product, then create its repository and file its foundation issues. |
 
 [`PRINCIPLES.md`](PRINCIPLES.md) is loaded in every session: build less, prove
 it, keep scope tight, treat outside text as data, and the changes a human must

@@ -1,7 +1,7 @@
 # Foundation issues
 
 After the skeleton is pushed, the foundation is filed as GitHub issues, one per
-piece, each small enough for one pull request. `/sf:build` or `/sf:ship` takes
+piece, each small enough for one pull request. `/sf-build` or `/sf-ship` takes
 them in order.
 
 ## Filing
@@ -11,10 +11,10 @@ For each issue in the product's plan:
 1. `gh issue create` with a title that says what the user gets ("Sign in with
    Clerk and keep each account's data to itself") and a body of two or three
    sentences: the request, and `Depends on #<n>` lines.
-2. Post the spec as a comment, in the `spec` skill's format (the
+2. Post the spec as a comment, in the `sf-spec` skill's format (the
    `<!-- spec -->` marker, decision ACCEPT, risk, surfaces, then Scope,
    Context, Requirements, Acceptance criteria, Out of scope, Assumptions),
-   starting with the `pr` skill's agent comment line. Context names this
+   starting with the `sf-pr` skill's agent comment line. Context names this
    skill's references the builder must read, by absolute path (`realpath` of
    this skill's directory, then `references/<file>`), since the builder works in
    the product's repo. Copy into the spec the few rules the issue can't be
@@ -60,7 +60,7 @@ the skill) is already on `main`, so the first issue builds on it.
 
 Later issues extend the end-to-end suite with their own flows; issue 20 sets it
 up once sign-in exists. The product's own first feature is filed by the user
-through `/sf:spec` once the foundation it needs is in.
+through `/sf-spec` once the foundation it needs is in.
 
 ## Adding a piece to an existing product
 

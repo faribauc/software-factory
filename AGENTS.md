@@ -10,10 +10,12 @@ change here applies to every project once saved.
 ## Important paths
 
 - `PRINCIPLES.md`: imported into every Claude Code and Codex session.
-- `skills/<name>/SKILL.md`: one folder per skill (`spec`, `council`, `build`, `ship`,
-  `pr`, `dashboard`, `saas`). Claude Code loads them through the plugin `sf`
-  (`.claude-plugin/`) as `/sf:<name>`; Codex through links in `~/.agents/skills`.
-  A skill may keep detail in `skills/<name>/references/`, linked from its
+- `skills/sf-<name>/SKILL.md`: one folder per skill (`sf-spec`, `sf-council`,
+  `sf-build`, `sf-ship`, `sf-pr`, `sf-dashboard`, `sf-saas`), each its own
+  command: `/sf-<name>` in Claude Code, `$sf-<name>` in Codex. They install with
+  `npx skills add <repo URL>`, or from a checkout with `./install` (links in
+  `~/.claude/skills` and `~/.agents/skills`). Each folder must work on its own.
+  A skill may keep detail in `skills/sf-<name>/references/`, linked from its
   `SKILL.md`.
 - `dashboard/`: the dashboard, a TanStack Start app (bun, Tailwind, shadcn/ui).
   `t3Projects()` in `src/server/state.ts` is the only code that reads T3's
@@ -43,5 +45,7 @@ bun test && bun run typecheck && bun run build
 bun run dev                                 # dashboard on http://127.0.0.1:7420
 ```
 
-After adding a skill folder, run `./install` again. After editing one, run
-`/reload-plugins` in Claude Code.
+After adding or renaming a skill folder, run `./install` again; an edit applies
+in the next session. Check that `npx skills add . --list` still finds every
+skill: it skips one whose frontmatter isn't valid YAML (an unquoted `: ` in the
+description).
