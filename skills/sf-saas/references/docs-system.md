@@ -48,8 +48,12 @@ an area and keeps it true in the same change.
 - Read the area doc before changing an area, and update it in the same change.
 - Read the matching skill before acting; use official CLIs over hand-written
   boilerplate.
-- Never start, restart or stop the dev servers (list the ports); tests may
-  start servers on port 0.
+- Keep the dev servers running on their fixed ports (list them). Start the
+  ones the work touches as early as you can, in the background. After a change
+  Vite can't hot-reload (dependencies, env, Vite or workspace config), restart
+  that server and reload the page. Never leave one stopped. If another checkout
+  already holds a port, leave its server alone and run this checkout's on a
+  free port. Tests start their own servers on port 0.
 - Never edit generated files (route trees, generated docs content); regenerate
   and commit them.
 - Never deploy, apply `.railway/railway.ts`, run production migrations or
