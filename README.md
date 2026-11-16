@@ -72,11 +72,25 @@ database read-only and GitHub through `gh`.
 
 ## Credits
 
-Ideas, not code, from:
+The skills and principles are written from scratch. The ideas behind them come
+from:
 
-- the ZazenCodes [software factory](https://github.com/zazencodes/zazencodes-season-3/tree/main/src/software-factory-claude-code-v2):
-  intake, specs with acceptance criteria, review lenses, a gate before review,
-  and the escalation list;
-- Theo's [tstack](https://github.com/t3dotgg/tstack): multi-provider council,
-  bounded review loops, proof before merging, and PR babysitting in T3 Code;
-- the `ponytail` skill: build the least that works.
+- **ZazenCodes**, the video
+  [Build Your Own AI Software Factory with Claude Code](https://www.youtube.com/watch?v=ctoaIC4LHmI)
+  and its source, versions [one](https://github.com/zazencodes/zazencodes-season-3/tree/main/src/software-factory-claude-code)
+  and [two](https://github.com/zazencodes/zazencodes-season-3/tree/main/src/software-factory-claude-code-v2):
+  the factory itself, issue intake, specs with acceptance criteria, review
+  lenses for security, UX and UI, a quality gate before review, the list of
+  changes a human must approve, and a local dashboard.
+- **Theo Browne's [tstack](https://github.com/t3dotgg/tstack)**: a council of
+  models from different providers, bounded review rounds, proof before merging,
+  watching PRs from T3 Code, and reviving or taking over stale work.
+- **Dietrich Gebert's [ponytail](https://github.com/DietrichGebert/ponytail)**:
+  build the least that works, and leave a note where you cut a corner.
+
+Built on [T3 Code](https://github.com/pingdotgg/t3code), which runs the agents
+and provides the delegation, worktree and PR-watching tools the skills use.
+The skills install with [`npx skills`](https://github.com/vercel-labs/skills).
+The dashboard uses [TanStack Start](https://tanstack.com/start),
+[Bun](https://bun.sh), [Tailwind CSS](https://tailwindcss.com) and
+[shadcn/ui](https://ui.shadcn.com).
