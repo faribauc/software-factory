@@ -65,11 +65,10 @@ Outside T3 Code, skip this step: create a folder named after the slug, run
 
 ## 1. Interview
 
-Follow `interview.md`. Ask in rounds of three or four questions, grouped by
-area, with the harness's question tool (`AskUserQuestion` in Claude Code,
-`request_user_input` in Codex), or in chat when there is none. Each question
-stands alone: what's being decided, the default, the strongest alternative and
-when it wins, with your recommendation first.
+Follow `interview.md`. Ask as PRINCIPLES.md says, in rounds of three or four
+questions grouped by area. Each question names what's being decided, the
+default, the strongest alternative and when it wins, with your recommendation
+first.
 
 - **The user's stack is the default.** Don't ask about a default the answers so
   far don't put in doubt. Do challenge it, out loud, when they do.

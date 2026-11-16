@@ -73,11 +73,8 @@ to read. Never merge with `--admin` or any other way around branch protection.
 
 ## Asking the user
 
-A question in a normal message goes unseen, and the thread looks finished. Ask
-with the harness's question tool (`AskUserQuestion` in Claude Code,
-`request_user_input` in Codex), with all the context in the question: the PR
-link, what blocks you, and the options with your recommendation first. In T3
-Code, unwatch the PR first.
+Ask as PRINCIPLES.md says, and put the PR link in the question. In T3 Code,
+unwatch the PR first.
 
 Ask only when you can't continue alone: you can't prove the change, the gate
 can't pass and you can't fix it, the next step is outside the grant, the goal
