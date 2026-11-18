@@ -103,9 +103,11 @@ if the plan changes.
 ## 4. Make the release
 
 1. Fetch again and start a branch at exactly the fetched tip, with a clean
-   tree: `git switch -c <branch> origin/<default branch>`, named the repo's way
-   (`release/2.3.0`) when releases go through PRs. If the tip moved since the
-   plan, judge the new commits and ask again if a version changes.
+   tree: `git switch -c <branch> --no-track origin/<default branch>`, named the
+   repo's way (`release/2.3.0`) when releases go through PRs. If the tip moved
+   since the plan, judge the new commits and ask again if a version changes.
+   Work the plan counted must be there, or come in the repo's way in this step;
+   if it can't, stop.
 2. Set the new version everywhere it is recorded, with the repo's tool if it has
    one: manifests, lockfiles (bun and npm lockfiles record workspace versions,
    and an install doesn't always update them), generated files. Search for the
@@ -148,12 +150,15 @@ if the plan changes.
      annotated (`git tag -a v2.3.0 <sha> -m v2.3.0`) unless they are
      lightweight.
    - When the publish step makes the tags itself, don't tag by hand. Run it
-     from that checkout (`changeset publish`), or name the commit
-     (`gh release create <tag> --target <sha>`), then check its tags point at
-     that commit.
-   - Push each tag by name (`git push origin v2.3.0`), never `--tags` or
-     `--follow-tags`, which also push stray local tags.
-   - Run the publish command or create the GitHub release the plan names.
+     from that checkout, or name the commit
+     (`gh release create <tag> --target <sha>`). `changeset publish` publishes
+     every package whose version the registry lacks: check that set matches
+     the plan first.
+   - Run each publish command or GitHub release the plan names exactly once.
+   - Push tags made locally by name (`git push origin v2.3.0`), never `--tags`
+     or `--follow-tags`, which also push stray local tags. Then check every
+     tag on the remote points at that commit
+     (`git ls-remote --tags origin <tag>`).
 
 ## 5. Watch it land
 
