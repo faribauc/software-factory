@@ -144,15 +144,16 @@ use the product.
    `git rev-parse '<split>^{tree}'` with
    `git rev-parse '<source>:packages/sdk-typescript'`; the tree IDs must match.
    Check `git log <split>` for the package's commits. Inspect the extracted
-   files and history for secrets and private material before pushing. Stop
-   and involve the owner if you find any.
+   files and history, including commit messages and author emails, for
+   secrets and private material. Stop and involve the owner if you find any.
    Get the owner's approval for the repository's visibility and publication
    before pushing.
 2. Push the inspected history to the approved SDK repository. Keep the npm
    package name and existing release history. Update `repository.url` and
    verify the standalone build and tests, with publishing disabled during
    setup. Confirm the SDK commit to pin is reachable on the remote branch.
-3. On the monorepo handoff branch, remove the tracked directory with
+3. In a fresh checkout of the monorepo handoff branch, before installing
+   dependencies or building the SDK, remove the tracked directory with
    `git rm -r packages/sdk-typescript`, add the SDK repository with
    `git submodule add <sdk-url> packages/sdk-typescript`, and check out the
    verified SDK commit inside the submodule. Stage `.gitmodules` and the
@@ -163,10 +164,9 @@ use the product.
    monorepo contract test against its golden fixtures.
 4. Get the package owner's approval before changing the npm publisher.
    Disable publishing from the old workflow before enabling the new one.
-   Verify the new
-   `repository.url` and the trusted publisher's repository and workflow
-   against the SDK repo. After the handoff, use its tag workflow and the next
-   appropriate version for the first authorized release.
+   Verify the new `repository.url` and the trusted publisher's repository
+   and workflow against the SDK repo. After the handoff, use its tag workflow
+   and the next appropriate version for the first authorized release.
 
 ## Tests
 
