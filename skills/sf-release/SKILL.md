@@ -157,8 +157,9 @@ if the plan changes.
    - Run each publish command or GitHub release the plan names exactly once.
    - Push tags made locally by name (`git push origin v2.3.0`), never `--tags`
      or `--follow-tags`, which also push stray local tags. Then check every
-     tag on the remote points at that commit
-     (`git ls-remote --tags origin <tag>`).
+     tag on the remote points at that commit:
+     `git ls-remote --tags origin <tag> '<tag>^{}'`; for an annotated tag the
+     `^{}` line holds the commit, the other the tag object.
 
 ## 5. Watch it land
 
