@@ -45,9 +45,10 @@ If the process still isn't clear, ask before changing anything.
 
 ## 2. Decide what to release
 
-Judge exactly what will ship. Run `git fetch --tags origin` first. Uncommitted
-work the user wants released goes in only the way the repo's release process
-takes it; never commit it straight to the default branch as part of the release.
+Judge exactly what will ship. Run `git fetch --tags origin` first. Judge
+uncommitted work the user wants released with the rest; it goes in only the way
+the repo's release process takes it, never committed straight to the default
+branch as part of the release.
 
 For each package or app, list what changed since its latest release tag
 (`git log <tag>..origin/<default branch> -- <path>`; a first release has no tag,
@@ -101,17 +102,18 @@ if the plan changes.
 
 ## 4. Make the release
 
-1. Fetch again, and start from the fetched tip with a clean tree
-   (`git merge --ff-only origin/<default branch>`). If it moved since the plan,
-   judge the new commits and ask again if a version changes. If releases go
-   through PRs, branch with the repo's naming (`release/2.3.0`).
+1. Fetch again and start a branch at exactly the fetched tip, with a clean
+   tree: `git switch -c <branch> origin/<default branch>`, named the repo's way
+   (`release/2.3.0`) when releases go through PRs. If the tip moved since the
+   plan, judge the new commits and ask again if a version changes.
 2. Set the new version everywhere it is recorded, with the repo's tool if it has
    one: manifests, lockfiles (bun and npm lockfiles record workspace versions,
    and an install doesn't always update them), generated files. Search for the
    old version string to find the rest. Run the tool in a mode that only edits
-   files (`changeset version`, `npm version <v> --no-git-tag-version`, adding
-   `--ignore-scripts` when its scripts push or publish); its commit, tag and
-   publish happen in the steps below.
+   files (`changeset version` with its `commit` option off,
+   `npm version <v> --no-git-tag-version`, adding `--ignore-scripts` when its
+   scripts push or publish); its commit, tag and publish happen in the steps
+   below. Check that the versions it wrote match the plan; ask again if not.
 3. If there is a changelog, give the pending entries a heading for the new
    version and today's date, keep the file's own layout (an empty `Unreleased`
    section if it has one), and point its compare links at the new version. Add
@@ -136,33 +138,35 @@ if the plan changes.
    - **Direct:** push the commit to the default branch.
 7. Find the release commit as it landed: the commit you pushed, or the PR's
    merge or squash commit (`gh pr view <n> --json mergeCommit`), never `HEAD` or
-   the branch tip. Fetch, and check it is on `origin/<default branch>` and that
-   its version files show the new version.
+   the branch tip. Fetch, check it out (`git switch --detach <sha>`), and check
+   it is on `origin/<default branch>` and that its version files show the new
+   version. Every tag and local publish below runs from this checkout.
 8. Publish in the repo's usual order, with the credentials already set up. If
    they are missing, stop; never ask for a token in chat or write one into the
    repo.
    - When the repo tags by hand, tag that commit by SHA, matching past tags:
      annotated (`git tag -a v2.3.0 <sha> -m v2.3.0`) unless they are
      lightweight.
-   - When the publish step makes the tags itself (`changeset publish`,
-     `gh release create`), don't tag by hand; check its tags point at that
-     commit.
+   - When the publish step makes the tags itself, don't tag by hand. Run it
+     from that checkout (`changeset publish`), or name the commit
+     (`gh release create <tag> --target <sha>`), then check its tags point at
+     that commit.
    - Push each tag by name (`git push origin v2.3.0`), never `--tags` or
      `--follow-tags`, which also push stray local tags.
    - Run the publish command or create the GitHub release the plan names.
 
 ## 5. Watch it land
 
-- Find the publishing run by workflow, commit and trigger; a run started by a
-  tag reports the tag as its branch
+- If the plan names a publishing run, find it by workflow, commit and trigger;
+  a run started by a tag reports the tag as its branch
   (`gh run list --workflow <file> --commit <sha> --branch <tag>`). Where the
   harness offers `t3_background_wait` (Claude Code in T3), start
   `gh run watch <id> --exit-status` as a background command and wait on it with
   that tool. Otherwise run `gh run watch <id> --exit-status` directly, so a
   failed run reports as a failure.
-- Then confirm the result: the tag on the remote (`git ls-remote --tags origin
-  <tag>`), the registry version (allow a minute or so for it to appear), and
-  the GitHub release if the automation makes one.
+- Then confirm what the plan names: the tag on the remote
+  (`git ls-remote --tags origin <tag>`), the registry version (allow a minute
+  or so for it to appear), the GitHub release.
 
 If a step fails, report which one and what is left. Don't retag.
 
