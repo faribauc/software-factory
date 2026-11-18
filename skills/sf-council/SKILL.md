@@ -30,17 +30,22 @@ Three seats, one per provider, each at high reasoning effort:
 
 | Seat | Default model | Leads on |
 | --- | --- | --- |
-| A | OpenAI's flagship: GPT-6.2 Sol (Codex) | correctness and scope, in depth |
-| B | Muse's flagship, Muse Wonder 1.0, when the change touches security; otherwise Muse Spark 1.3, which spares the user's Muse limit | security when the change touches it, otherwise ux and ui |
+| A | GPT-6.2 Sol (Codex) when the change is risky, otherwise GPT-6.1 Terra | correctness and scope, in depth |
+| B | Muse Wonder 1.0 when the change touches security, otherwise Muse Spark 1.3 | security when the change touches it, otherwise ux and ui |
 | C | Claude's flagship that isn't the builder's model: Claude Fable 5.2, or Claude Opus 5.5 when Fable built the change | ux and ui when the change touches `ui`, otherwise security |
 
+- **Lighter models save the user's limits.** A change is risky when it touches
+  security, auth, data or concurrency, or changes more than about 300 lines
+  (`git diff --shortstat <base>`). When unsure whether a change is risky or
+  touches security, take the stronger model. Decide before round 1.
 - **Never seat the builder's model.** A model reviewing its own work is not an
   independent reviewer.
 - **One seat per provider.** If a provider is unavailable, fill its seat with a
   second model from another provider, never the builder's, and name the
   substitution in the report.
-- **Newer models replace the defaults.** When a provider ships a newer flagship,
-  use it and update this table.
+- **Newer models replace the defaults.** When a provider ships a newer version
+  of a model in this table, use it and update the table. Keep the strong and
+  light pair in seats A and B.
 - **The user's choice wins.** If the user named members, use exactly those. If
   one is unavailable, say so and don't replace it silently.
 - **Every seat reviews correctness and scope.** The lead lens is where it goes
@@ -50,9 +55,9 @@ To start them:
 
 - **In T3 Code:** call `orchestrator_capabilities` to resolve models, then
   start one `delegate_task` per member in the same turn: `role: "review"`,
-  `mode: "async"`, a new `clientRequestId` each round. Set each seat's effort
-  option to high in `target.options`; don't rely on the default, which can be
-  max (Muse Wonder's is) and burns the provider's limit. Keep each `taskId`. Wait
+  `mode: "async"`, a new `clientRequestId` each round. Set effort to high in
+  `target.options`: `effort` for Claude, `reasoningEffort` for Codex and Muse.
+  Provider defaults range from low to max. Keep each `taskId`. Wait
   for their completion notices; don't poll, and don't edit the reviewed files
   while they run.
 - **Elsewhere:** use the harness's subagents and report which providers you
