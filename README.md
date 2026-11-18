@@ -50,6 +50,7 @@ issue ─ spec ─ code ─ checks ─ council ─ pr ─ merge gate ─ merged 
 | [`sf-build`](skills/sf-build/SKILL.md) | `/sf-build <request or issue>`: run the whole flow unattended and stop at a ready PR. |
 | [`sf-ship`](skills/sf-ship/SKILL.md) | `/sf-ship <request or issue>`: the same flow, then merge once the merge gate passes. |
 | [`sf-pr`](skills/sf-pr/SKILL.md) | File, watch and update PRs, post comments, revive old PRs, take over unfinished work. |
+| [`sf-release`](skills/sf-release/SKILL.md) | `/sf-release`: pick each package's SemVer bump from its changes, confirm the plan, then version, tag, publish and check it the way the repo already does. |
 | [`sf-dashboard`](skills/sf-dashboard/SKILL.md) | Start the local dashboard. |
 | [`sf-saas`](skills/sf-saas/SKILL.md) | `/sf-saas`: interview you about a SaaS product, then create its repository and file its foundation issues. |
 
