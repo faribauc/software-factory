@@ -11,12 +11,12 @@ change here applies to every project once saved.
 
 - `PRINCIPLES.md`: imported into every Claude Code and Codex session.
 - `skills/sf-<name>/SKILL.md`: one folder per skill (`sf-spec`, `sf-council`,
-  `sf-build`, `sf-ship`, `sf-pr`, `sf-dashboard`, `sf-saas`), each its own
-  command: `/sf-<name>` in Claude Code, `$sf-<name>` in Codex. They install with
-  `npx skills add <repo URL>`, or from a checkout with `./install` (links in
-  `~/.claude/skills` and `~/.agents/skills`). Each folder must work on its own.
-  A skill may keep detail in `skills/sf-<name>/references/`, linked from its
-  `SKILL.md`.
+  `sf-build`, `sf-ship`, `sf-pr`, `sf-release`, `sf-dashboard`, `sf-saas`), each
+  its own command: `/sf-<name>` in Claude Code, `$sf-<name>` in Codex. They
+  install with `npx skills add <repo URL>`, or from a checkout with `./install`
+  (links in `~/.claude/skills` and `~/.agents/skills`). Each folder must work on
+  its own. A skill may keep detail in `skills/sf-<name>/references/`, linked
+  from its `SKILL.md`.
 - `dashboard/`: the dashboard, a TanStack Start app (bun, Tailwind, shadcn/ui).
   `t3Projects()` in `src/server/state.ts` is the only code that reads T3's
   internal database; `src/lib/factory.ts` holds the stage and stats rules.

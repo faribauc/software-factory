@@ -10,7 +10,7 @@ REPO=$(cd "$(dirname "$0")" && pwd)
 BACKUP="$HOME/.agents/skills-backup/$(date +%Y%m%d-%H%M%S)"
 # Skills this repo replaces, and its own names before the sf- prefix. Moved to
 # the backup if present.
-RETIRED="always-ponytail ponytail babysit-pr council file-pr full-send full-stop leaving-pr-comments modernize sol-loop takeover
+RETIRED="always-ponytail ponytail babysit-pr bump-version council file-pr full-send full-stop leaving-pr-comments modernize sol-loop takeover
 spec build ship pr dashboard saas"
 
 stash() {  # stash <path> <backup subfolder>
