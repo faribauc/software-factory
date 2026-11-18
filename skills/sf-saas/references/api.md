@@ -135,6 +135,39 @@ use the product.
   OIDC, no token, provenance included); `repository.url` must match the
   repository exactly. The monorepo never publishes.
 
+### Extract an existing standalone SDK
+
+1. Start from a clean, committed monorepo checkout. Record the source commit
+   and SDK path. For `packages/sdk-typescript`, run
+   `git subtree split --prefix=packages/sdk-typescript HEAD` and record the
+   returned commit as `<split>`. Compare
+   `git rev-parse '<split>^{tree}'` with
+   `git rev-parse '<source>:packages/sdk-typescript'`; the tree IDs must match.
+   Check `git log <split>` for the package's commits. Inspect the extracted
+   files and history for secrets and private material before pushing. Stop
+   and involve the owner if you find any.
+   Get the owner's approval for the repository's visibility and publication
+   before pushing.
+2. Push the inspected history to the approved SDK repository. Keep the npm
+   package name and existing release history. Update `repository.url` and
+   verify the standalone build and tests, with publishing disabled during
+   setup. Confirm the SDK commit to pin is reachable on the remote branch.
+3. On the monorepo handoff branch, remove the tracked directory with
+   `git rm -r packages/sdk-typescript`, add the SDK repository with
+   `git submodule add <sdk-url> packages/sdk-typescript`, and check out the
+   verified SDK commit inside the submodule. Stage `.gitmodules` and the
+   submodule pointer. Follow [the CI guidance](repo.md#ci) wherever CI needs
+   SDK files. The SDK repository owns package dependency bumps, and the
+   monorepo updates the submodule pointer. Before merging, verify a fresh
+   recursive clone checks out the pinned commit and passes the existing
+   monorepo contract test against its golden fixtures.
+4. Get the package owner's approval before changing the npm publisher.
+   Disable publishing from the old workflow before enabling the new one.
+   Verify the new
+   `repository.url` and the trusted publisher's repository and workflow
+   against the SDK repo. After the handoff, use its tag workflow and the next
+   appropriate version for the first authorized release.
+
 ## Tests
 
 Every 401, 403, 503 and 429 path; revoked keys, purged tenants, downgraded
