@@ -30,7 +30,7 @@ Three seats, one per provider, each at high reasoning effort:
 
 | Seat | Default model | Leads on |
 | --- | --- | --- |
-| A | OpenAI's flagship: GPT-6.1 Sol (Codex) | correctness and scope, in depth |
+| A | OpenAI's flagship: GPT-6.2 Sol (Codex) | correctness and scope, in depth |
 | B | Muse's flagship, Muse Wonder 1.0, when the change touches security; otherwise Muse Spark 1.3, which spares the user's Muse limit | security when the change touches it, otherwise ux and ui |
 | C | Claude's flagship that isn't the builder's model: Claude Fable 5.2, or Claude Opus 5.5 when Fable built the change | ux and ui when the change touches `ui`, otherwise security |
 
