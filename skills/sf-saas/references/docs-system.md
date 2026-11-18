@@ -100,6 +100,26 @@ Each provider step says which of its environments to use (Clerk development
 instance, WorkOS staging, Polar sandbox, a dev Turso database) and repeats in
 the production phases with production values.
 
+Before release, list the selected environment's prerequisites in dependency
+order. Give each step a read-only command or inspection and the expected
+result. Verify that services point to the intended target and that development
+cannot access production data. Check that required configuration is available
+to each service and report missing setting names without printing secret
+values. Include the check agreed for the product's data protection needs,
+such as confirming that backups are enabled and recent.
+
+After release, record the actual commands, endpoints and expected responses
+for read-only smoke checks. Include only the surfaces the product ships:
+
+- For each deployed service with a public page or health endpoint, request it
+  and check for its documented success response.
+- For a keyed API, make a read-only request to a protected endpoint without
+  a key and check for its documented authentication error.
+- For a signed webhook, send a request with an invalid signature and check
+  for its documented rejection response. Use a non-actionable payload and
+  confirm from the handler's test that signature rejection happens before
+  any handler side effect.
+
 When the checklist passes about a dozen steps, add a read-only `setup:check`
 validator: one step registry with ids, phases, `requires` and a `fix` per step,
 checks with an injected `exec`, `readFile` and DNS resolver so tests never touch
