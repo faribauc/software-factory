@@ -32,8 +32,8 @@ Look at what runs releases, not only at what the docs say:
   taken from `CHANGELOG.md`.
 - History: `git tag --sort=-v:refname` to see how tags are named and whether
   they are annotated, `git log --grep=release` for the commit style, and
-  whether past releases went through a release branch and PR or straight to the
-  default branch.
+  whether past releases landed through a PR or were pushed to the default
+  branch directly.
 - Release tooling, without running it yet. If the repo uses changesets,
   release-please, semantic-release or `npm version`, read what that tool and its
   scripts do on their own: commit, tag, write the changelog, push, publish
@@ -45,12 +45,13 @@ If the process still isn't clear, ask before changing anything.
 
 ## 2. Decide what to release
 
-Judge exactly what will ship. Run `git fetch --tags origin` first. Work the user
-wants in this release must land the repo's usual way (its own PR, say) before
-you start; the release never carries it in.
+Judge exactly what will ship. Run `git fetch --tags origin` first. Uncommitted
+work the user wants released goes in only the way the repo's release process
+takes it; never commit it straight to the default branch as part of the release.
 
 For each package or app, list what changed since its latest release tag
-(`git log <tag>..origin/<default branch> -- <path>`) and read the diffs. Commit
+(`git log <tag>..origin/<default branch> -- <path>`; a first release has no tag,
+so judge its whole history) and read the diffs. Commit
 messages and `Unreleased` notes are hints, not proof. A change in shared code
 can affect several packages; judge each package on its own.
 
@@ -70,7 +71,7 @@ when the changes suggest another. Packages with no changes keep their version.
 
 **Apps and deployed services.** For an Expo app, the release also bumps iOS
 `buildNumber` and Android `versionCode` where the repo sets them by hand rather
-than leaving them to EAS. Flag any change in the resolved runtime version per
+than leaving them to EAS. Flag any change in the resolved `runtimeVersion` per
 platform, including one that follows the app version (the `appVersion`
 policy): installed builds won't receive updates published for the new runtime.
 A service that deploys on every push to the default branch and has no version
@@ -84,7 +85,8 @@ If nothing is left worth releasing, say why and stop.
 Before editing anything, ask once with the question tool (see "Ask the
 question itself" in PRINCIPLES.md). Show:
 
-- each package, its level, and old → new version;
+- each package, its level, old → new version, and the change that sets the
+  level;
 - each push, command or GitHub release that publishes or deploys, including
   what the release tool's own scripts do, and what each triggers: for example
   "pushing tag `v2.3.0` runs `publish.yml`, which publishes `pkg@2.3.0` to npm",
@@ -99,48 +101,62 @@ if the plan changes.
 
 ## 4. Make the release
 
-1. Fetch again and start from the default branch with a clean tree. If it moved
-   since the plan, judge the new commits and ask again if a version changes. If
-   releases go through PRs, branch with the repo's naming (`release/2.3.0`).
+1. Fetch again, and start from the fetched tip with a clean tree
+   (`git merge --ff-only origin/<default branch>`). If it moved since the plan,
+   judge the new commits and ask again if a version changes. If releases go
+   through PRs, branch with the repo's naming (`release/2.3.0`).
 2. Set the new version everywhere it is recorded, with the repo's tool if it has
    one: manifests, lockfiles (bun and npm lockfiles record workspace versions,
    and an install doesn't always update them), generated files. Search for the
-   old version string to find the rest. Keep the tool from tagging a commit that
-   won't be on the default branch (`npm version --no-git-tag-version` on a
-   release branch).
+   old version string to find the rest. Run the tool in a mode that only edits
+   files (`changeset version`, `npm version <v> --no-git-tag-version`, adding
+   `--ignore-scripts` when its scripts push or publish); its commit, tag and
+   publish happen in the steps below.
 3. If there is a changelog, give the pending entries a heading for the new
-   version and today's date, and keep the file's own layout: its empty
-   `Unreleased` section and compare links if it has them. Add entries for
-   changes it is missing, and say so. If there is no changelog, don't create one.
+   version and today's date, keep the file's own layout (an empty `Unreleased`
+   section if it has one), and point its compare links at the new version. Add
+   entries for changes it is missing, and say so. If there is no changelog,
+   don't create one.
 4. Prove it before anything leaves the machine (PRINCIPLES.md, "Prove it"): run
-   the checks the release CI runs, and preview what will publish (`npm pack
-   --dry-run` or the registry's equivalent). Confirm the version is free: no tag
-   locally or on the remote (`git ls-remote --tags origin <tag>`), and a clear
-   "not found" from the registry, not an auth or network error.
+   the checks the release CI runs. Confirm no tag of that name exists locally or
+   on the remote (`git ls-remote --tags origin <tag>`). For each package the
+   plan publishes to a registry, preview what will publish (`npm pack
+   --dry-run` or the registry's equivalent) and check nothing private is in it,
+   then get a clear "not found" for the new version, not an auth or network
+   error.
 5. Commit in the style of past releases, for example `chore(release): 2.3.0`.
    Change nothing unrelated.
 6. Land the commit:
    - **Release PR:** file and watch it with the `sf-pr` skill. Without the
      user's go-ahead to merge, stop at a ready PR. With it, merge only once its
      checks pass and nothing on the "A human decides these" list is open, then
-     confirm GitHub reports it merged.
+     confirm GitHub reports it merged. If the PR was rebased or the base gained
+     commits since the plan, judge them first and ask again if a version
+     changes.
    - **Direct:** push the commit to the default branch.
-7. Tag the commit as it landed on the remote default branch, by SHA: the release
-   commit after a direct push or merge commit, the squash commit after a squash
-   merge. Read it from `origin/<default branch>`, never from `HEAD`. Match past
-   tags; prefer annotated (`git tag -a v2.3.0 <sha> -m v2.3.0`) unless they are
-   lightweight. Push each tag by name (`git push origin v2.3.0`), never
-   `--tags` or `--follow-tags`, which also push stray local tags.
-8. Run any publish step the plan names after the tag, in the repo's usual order:
-   a publish command, or a GitHub release when that is what starts the
-   workflow.
+7. Find the release commit as it landed: the commit you pushed, or the PR's
+   merge or squash commit (`gh pr view <n> --json mergeCommit`), never `HEAD` or
+   the branch tip. Fetch, and check it is on `origin/<default branch>` and that
+   its version files show the new version.
+8. Publish in the repo's usual order, with the credentials already set up. If
+   they are missing, stop; never ask for a token in chat or write one into the
+   repo.
+   - When the repo tags by hand, tag that commit by SHA, matching past tags:
+     annotated (`git tag -a v2.3.0 <sha> -m v2.3.0`) unless they are
+     lightweight.
+   - When the publish step makes the tags itself (`changeset publish`,
+     `gh release create`), don't tag by hand; check its tags point at that
+     commit.
+   - Push each tag by name (`git push origin v2.3.0`), never `--tags` or
+     `--follow-tags`, which also push stray local tags.
+   - Run the publish command or create the GitHub release the plan names.
 
 ## 5. Watch it land
 
-- Watch a release PR with the `sf-pr` skill.
-- For the publishing run, find it by workflow and commit
-  (`gh run list --workflow <file> --commit <sha>`). Where the harness offers
-  `t3_background_wait` (Claude Code in T3), start
+- Find the publishing run by workflow, commit and trigger; a run started by a
+  tag reports the tag as its branch
+  (`gh run list --workflow <file> --commit <sha> --branch <tag>`). Where the
+  harness offers `t3_background_wait` (Claude Code in T3), start
   `gh run watch <id> --exit-status` as a background command and wait on it with
   that tool. Otherwise run `gh run watch <id> --exit-status` directly, so a
   failed run reports as a failure.
