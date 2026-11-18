@@ -91,6 +91,11 @@ Phases: local tools · Turso (development) · auth provider (development) · Pol
 (sandbox) · email (Resend) · observability · ready for local development ·
 Railway · domain · production auth · production database and webhooks · smoke.
 
+The Railway phase also sets, in each service's settings, what
+`deploy-railway.md` lists as unconfirmed in `.railway/railway.ts`, watch paths
+first. Check them both ways: a commit touching only `docs/` deploys nothing,
+and one touching only `packages/env` deploys every service.
+
 Each provider step says which of its environments to use (Clerk development
 instance, WorkOS staging, Polar sandbox, a dev Turso database) and repeats in
 the production phases with production values.

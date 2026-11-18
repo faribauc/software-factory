@@ -39,6 +39,9 @@ AGENTS.md  CLAUDE.md (links to AGENTS.md)  PRODUCT.md  CONTEXT.md  README.md  .e
   `linkWorkspacePackages = false`. The SDK is never a workspace.
 - Tasks run across workspaces with `vp run` (`-r` for every package in
   dependency order, `--filter` for some), cached locally. No Turborepo.
+- Apps import workspace packages, so each app is built and deployed from the
+  repo root with one `bun.lock`, never as its own folder with its own install
+  (`deploy-railway.md`).
 
 ## Tooling
 
@@ -117,7 +120,7 @@ uses ports from 4300 so it never collides with the dev servers.
   report on failure) and actionlint.
 - Concurrency: a newer push to a PR cancels its older run, but **every push to
   `main` gets its own group**, so no `main` run is cancelled and Railway's Wait
-  for CI deploys every merge:
+  for CI deploys every merge that matches a service's watch paths:
 
   ```yaml
   concurrency:

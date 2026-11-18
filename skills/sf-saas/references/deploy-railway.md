@@ -7,7 +7,7 @@ creates the Railway project, the Turso databases and the domains.
 
 ## Services
 
-| Service | From | Domain | Notes |
+| Service | App | Domain | Notes |
 | --- | --- | --- | --- |
 | `web` | `apps/web` | `<domain>`, `www.<domain>` | Serves the prerendered files: directory index, `404.html` with status 404, long cache on hashed assets, HTML revalidated |
 | `dashboard` | `apps/dashboard` | `app.<domain>` | Owns migrations when there's no `api` |
@@ -22,8 +22,17 @@ Services that call each other use Railway's private network
 
 - Nitro with the `bun` preset in each app's `vite.config.ts`:
   `nitro({ preset: "bun" })`, `tailwindcss()`, `tanstackStart()`, `viteReact()`.
-- `bun run build` writes `.output/`; the start command is
-  `bun .output/server/index.mjs`.
+- **Every service builds from the repo root**, never from its app's folder. A
+  root directory makes Railway pull down only that folder, so the workspace
+  packages the app imports (`packages/ui`, `packages/db`, `config`, `env`) and
+  the root `bun.lock` are missing and the build fails.
+- Each server (`web` included: its Nitro server serves the prerendered files)
+  scopes its commands to its app: the build command is
+  `bun run --filter @<slug>/<app> build`, which writes `apps/<app>/.output/`;
+  the start command is `bun apps/<app>/.output/server/index.mjs`. `jobs` has
+  no server (see the cron service).
+- Installing from the root runs the root `prepare` script (`vp hooks enable`);
+  check on the first deploy that it doesn't fail the build.
 - Locally `start` sets `HOST=localhost`. On Railway the start command sets no
   `HOST`, so the server listens on all interfaces, on the `PORT` Railway
   injects.
@@ -50,10 +59,10 @@ export default defineRailway((ctx) => {
   const prod = ctx.environment === "production";
 
   const api = service("api", {
-    source: github(repo, { branch: "main", rootDirectory: "apps/api" }),
-    build: "bun run build",
+    source: github(repo, { branch: "main" }), // no rootDirectory: builds from the repo root
+    build: "bun run --filter @<slug>/api build",
     preDeploy: "bun run db:migrate",
-    start: "bun .output/server/index.mjs",
+    start: "bun apps/api/.output/server/index.mjs",
     healthcheck: "/health",
     domains: prod ? ["api.<domain>"] : [],
     env: {
@@ -67,9 +76,9 @@ export default defineRailway((ctx) => {
   });
 
   const dashboard = service("dashboard", {
-    source: github(repo, { branch: "main", rootDirectory: "apps/dashboard" }),
-    build: "bun run build",
-    start: "bun .output/server/index.mjs",
+    source: github(repo, { branch: "main" }),
+    build: "bun run --filter @<slug>/dashboard build",
+    start: "bun apps/dashboard/.output/server/index.mjs",
     healthcheck: "/health",
     domains: prod ? ["app.<domain>"] : [],
     env: {
@@ -85,17 +94,45 @@ export default defineRailway((ctx) => {
 ```
 
 Confirmed in Railway's IaC reference (checked 2026-11): `service`,
-`github(repo, { branch, rootDirectory })`, `build`, `start`, `preDeploy` (a
+`github(repo, { branch })`, `build`, `start`, `preDeploy` (a
 failure stops the deploy), `healthcheck`, `healthcheckTimeout`, `domains`
 (strings or `{ domain, port }`), `env` with references to other services,
 shared variables (`ctx.shared.X`) and `preserve()` (keep the value already set
-in Railway), `replicas`, and branching on `ctx.environment`.
+in Railway), `replicas`, and branching on `ctx.environment`. `github()` also
+takes `rootDirectory`, and the reference's larger example uses it; leave it
+out, because Railway's monorepo guide says a root directory pulls down only
+that folder, and builds a shared monorepo from the root with a build and start
+command per service.
 
 **Not confirmed there; check the reference before writing them:** the builder
 choice (Railpack is the default), the cron schedule, the restart policy, watch
 paths and Wait for CI. Until confirmed, the setup checklist sets them in each
-service's settings. In a monorepo, watch paths matter: without them, every
-service rebuilds on every merge. Also check the exact import list.
+service's settings (watch paths: see below). Also check the exact import list.
+
+## Watch paths
+
+Building from the root means any change would redeploy every service, so each
+service gets watch paths: its app's folder, the workspace packages it imports
+(follow its `@<slug>/*` dependencies, and theirs), and the root files every
+install reads. Patterns are gitignore-style and start from `/`; a change that
+matches none skips the deploy, so `docs/**`, `AGENTS.md` and `.github/**`
+deploy nothing. Set them in each service's settings, one per line, each
+package as `/packages/<name>/**`, replacing any value Railway pre-filled (its
+monorepo import sets the app's folder alone):
+
+| Service | Watch paths |
+| --- | --- |
+| every service | `/package.json`, `/bun.lock`, `/bunfig.toml`, `/packages/typescript-config/**` |
+| `web` | `/apps/web/**`; packages `config`, `env`, `start-kit`, `ui`, `docs`, `observability`, `billing` (pricing) |
+| `dashboard` | `/apps/dashboard/**`; packages `config`, `env`, `start-kit`, `ui`, `db`, `billing`, `email`, `observability` |
+| `admin` | `/apps/admin/**`; packages `config`, `env`, `start-kit`, `ui`, `db`, `billing`, `email`, `observability` |
+| `api` | `/apps/api/**`; packages `config`, `env`, `start-kit`, `db`, `billing`, `email`, `observability`, `docs` (MCP) |
+| `jobs` | `/apps/jobs/**`; packages `config`, `env`, `db`, `billing`, `email`, `observability` |
+
+The service that owns migrations also watches `/scripts/**`, where the
+migrations runner lives. The rows are a starting point: each app's resolved
+`@<slug>/*` dependencies decide, so update a row when they change. A missing
+package means its changes never deploy that app.
 
 ## Variables
 
@@ -140,7 +177,11 @@ tests.
 
 ## The cron service
 
-`apps/jobs` runs one script per job (`bun run retention`) on a cron schedule:
+`apps/jobs` runs one script per job on a cron schedule, from the repo root like
+every service. The start command is
+`bun run --filter @<slug>/jobs retention -- --apply` (the script's default is a
+dry run, `lifecycle.md`); when emails are translated, the build command is
+`bun run --filter @<slug>/jobs build`, which runs `gt translate`.
 
 - UTC, at least five minutes apart, not exact to the minute: jobs work from due
   dates in the data, never "it's 14:00 now";
