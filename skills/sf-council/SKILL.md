@@ -35,16 +35,18 @@ Three seats, one per provider, each at high reasoning effort:
 | C | Claude's flagship that isn't the builder's model: Claude Fable 5.2, or Claude Opus 5.5 when Fable built the change | ux and ui when the change touches `ui`, otherwise security |
 
 - **Lighter models save the user's limits.** A change is risky when it touches
-  security, auth, data or concurrency, or changes more than about 300 lines
-  (`git diff --shortstat <base>`). When unsure whether a change is risky or
-  touches security, take the stronger model. Decide before round 1.
+  security (auth included), stored data (schema, migrations, deletes) or
+  concurrency, or changes more than about 300 lines, new files included. Judge
+  from the diff, not only the spec header. When unsure, take the stronger
+  model. Decide before round 1; if a later round shows the change is risky or
+  touches security, move up to the stronger model, never back.
 - **Never seat the builder's model.** A model reviewing its own work is not an
   independent reviewer.
 - **One seat per provider.** If a provider is unavailable, fill its seat with a
   second model from another provider, never the builder's, and name the
   substitution in the report.
-- **Newer models replace the defaults.** When a provider ships a newer version
-  of a model in this table, use it and update the table. Keep the strong and
+- **Newer models replace the defaults.** When a provider ships a newer flagship,
+  or a newer version of a model in this table, use it and update the table. Keep the strong and
   light pair in seats A and B.
 - **The user's choice wins.** If the user named members, use exactly those. If
   one is unavailable, say so and don't replace it silently.
