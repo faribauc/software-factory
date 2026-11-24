@@ -131,8 +131,9 @@ monorepo import sets the app's folder alone):
 
 The service that owns migrations also watches `/scripts/**`, where the
 migrations runner lives. The rows are a starting point: each app's resolved
-`@<slug>/*` dependencies decide, so update a row when they change. A missing
-package means its changes never deploy that app.
+`@<slug>/*` dependencies decide. When they change, update that service's
+watch paths in Railway and in `docs/setup.md`. A missing package means its
+changes never deploy that app.
 
 ## Variables
 
