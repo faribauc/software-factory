@@ -73,7 +73,9 @@ closing, a final notice on day 76 stating the deletion date, the purge on day
 - Win-backs are marketing: skipped for opted-out and disabled accounts. The
   final notice and the purge always happen.
 - It runs under a Sentry cron monitor, so a missed or failed run alerts.
-- By hand: `bun run retention -- --dry-run` (the default) or `-- --apply`;
+- By hand, from the repo root:
+  `bun run --filter @<slug>/jobs retention -- --dry-run` (the default) or
+  `-- --apply`;
   emails go to the log unless `EMAIL_TRANSPORT=resend`; exit 1 if a step
   failed.
 
