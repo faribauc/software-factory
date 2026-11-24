@@ -115,7 +115,7 @@ Building from the root means any change would redeploy every service, so each
 service gets watch paths: its app's folder, the workspace packages it imports
 (follow its `@<slug>/*` dependencies, and theirs), and the root files every
 install reads. Patterns are gitignore-style and start from `/`; a change that
-matches none skips the deploy, so `docs/**`, `AGENTS.md` and `.github/**`
+matches none skips the deploy, so `/docs/**`, `/AGENTS.md` and `/.github/**`
 deploy nothing. Set them in each service's settings, one per line, each
 package as `/packages/<name>/**`, replacing any value Railway pre-filled (its
 monorepo import sets the app's folder alone):
