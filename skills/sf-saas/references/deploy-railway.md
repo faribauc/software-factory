@@ -164,7 +164,11 @@ tests.
   workflow on the commit finishes, and a failed workflow skips the deploy. It
   only shows when the repo has a workflow on `push`, and it gives up after two
   hours. CI must never cancel a `main` run (`repo.md`), or that merge never
-  deploys.
+  deploys. A merge whose deploy Wait for CI skipped, or whose deploy failed,
+  isn't retried by a later merge outside that service's watch paths: once the
+  cause is fixed, deploy the latest commit by hand on each service it should
+  have reached (Deploy Latest Commit in Railway's command palette; Redeploy
+  rebuilds the old code).
 - **Migrations** run in the owning service's pre-deploy command, with the
   service's variables and private network. A failure stops the deploy and the
   old version keeps serving. Migrations are additive (`data.md`).
