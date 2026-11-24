@@ -99,10 +99,9 @@ failure stops the deploy), `healthcheck`, `healthcheckTimeout`, `domains`
 (strings or `{ domain, port }`), `env` with references to other services,
 shared variables (`ctx.shared.X`) and `preserve()` (keep the value already set
 in Railway), `replicas`, and branching on `ctx.environment`. `github()` also
-takes `rootDirectory`, and the reference's larger example uses it; leave it
-out, because Railway's monorepo guide says a root directory pulls down only
-that folder, and builds a shared monorepo from the root with a build and start
-command per service.
+takes `rootDirectory` (the reference's larger example uses it); leave it out
+(see the build). Railway's monorepo guide builds a shared monorepo from
+the root with a build and start command per service.
 
 **Not confirmed there; check the reference before writing them:** the builder
 choice (Railpack is the default), the cron schedule, the restart policy, watch
