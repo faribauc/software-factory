@@ -62,7 +62,8 @@ To start them:
   `target.options`: `effort` for Claude, `reasoningEffort` for Codex and Muse.
   Provider defaults range from low to max. Keep each `taskId`. Wait for their
   completion notices; don't poll, and don't edit the reviewed files while they
-  run.
+  run. When you replace a member that failed on a rate or quota limit,
+  `task_cancel` its task, or T3 resumes it at the reset with a stale brief.
 - **Elsewhere:** use the harness's subagents and report which providers you
   couldn't reach.
 
