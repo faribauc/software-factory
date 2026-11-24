@@ -33,8 +33,8 @@ writes queries.
 - `bun run db:generate` (drizzle-kit) writes a SQL migration from the schema
   change. Read it before committing: drizzle-kit can't know a rename from a
   drop and add.
-- `bun run db:migrate` applies pending migrations. Railway runs it as each
-  service's **pre-deploy command**: a failure stops the deploy and the old
+- `bun run db:migrate` applies pending migrations. Railway runs it as the
+  owning service's **pre-deploy command**: a failure stops the deploy and the old
   version keeps serving. Tests and `dev:api -- --memory` run it on their fresh
   database.
 - **Migrations are additive.** The old code keeps running while the new one

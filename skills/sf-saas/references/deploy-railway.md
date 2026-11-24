@@ -169,8 +169,9 @@ tests.
   cause is fixed, deploy the latest commit by hand on each service it should
   have reached (Deploy Latest Commit in Railway's command palette; Redeploy
   rebuilds the old code).
-- **Migrations** run in the owning service's pre-deploy command, with the
-  service's variables and private network. A failure stops the deploy and the
+- **Migrations** run in the owning service's pre-deploy command (the root
+  `bun run db:migrate`, never filtered to the app), with the service's
+  variables and private network. A failure stops the deploy and the
   old version keeps serving. Migrations are additive (`data.md`).
 - **Rollback:** redeploy an earlier deployment in Railway. An applied
   migration stays applied, which is why they're additive.
