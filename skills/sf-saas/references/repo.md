@@ -40,8 +40,10 @@ AGENTS.md  CLAUDE.md (links to AGENTS.md)  PRODUCT.md  CONTEXT.md  README.md  .e
 - Tasks run across workspaces with `vp run` (`-r` for every package in
   dependency order, `--filter` for some), cached locally. No Turborepo.
 - Apps import workspace packages, so each app is built and deployed from the
-  repo root with one `bun.lock`, never as its own folder with its own install
-  (`deploy-railway.md`).
+  repo root with one `bun.lock`, never as its own folder with its own install.
+  An app's own scripts (its Railway build, a job run by hand) run with
+  `bun run --filter` (`deploy-railway.md`); `vp run` stays the runner for
+  workspace tasks.
 
 ## Tooling
 

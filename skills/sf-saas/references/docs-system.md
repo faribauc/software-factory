@@ -93,7 +93,9 @@ Railway · domain · production auth · production database and webhooks · smok
 
 The Railway phase also sets, in each service's settings, what
 `deploy-railway.md` lists as unconfirmed in `.railway/railway.ts`, watch paths
-first. Check them both ways: a commit touching only `docs/` deploys nothing,
+first. Check that no service has a root directory set in its Railway settings,
+then check watch paths both ways: a commit touching only the root `docs/`
+folder deploys nothing,
 and one touching only `packages/env` deploys every service.
 
 Each provider step says which of its environments to use (Clerk development

@@ -99,10 +99,9 @@ failure stops the deploy), `healthcheck`, `healthcheckTimeout`, `domains`
 (strings or `{ domain, port }`), `env` with references to other services,
 shared variables (`ctx.shared.X`) and `preserve()` (keep the value already set
 in Railway), `replicas`, and branching on `ctx.environment`. `github()` also
-takes `rootDirectory`, and the reference's larger example uses it; leave it
-out, because Railway's monorepo guide says a root directory pulls down only
-that folder, and builds a shared monorepo from the root with a build and start
-command per service.
+takes `rootDirectory` (the reference's larger example uses it); leave it out
+(see the build). Railway's monorepo guide builds a shared monorepo from
+the root with a build and start command per service.
 
 **Not confirmed there; check the reference before writing them:** the builder
 choice (Railpack is the default), the cron schedule, the restart policy, watch
@@ -115,7 +114,7 @@ Building from the root means any change would redeploy every service, so each
 service gets watch paths: its app's folder, the workspace packages it imports
 (follow its `@<slug>/*` dependencies, and theirs), and the root files every
 install reads. Patterns are gitignore-style and start from `/`; a change that
-matches none skips the deploy, so `docs/**`, `AGENTS.md` and `.github/**`
+matches none skips the deploy, so `/docs/**`, `/AGENTS.md` and `/.github/**`
 deploy nothing. Set them in each service's settings, one per line, each
 package as `/packages/<name>/**`, replacing any value Railway pre-filled (its
 monorepo import sets the app's folder alone):
@@ -131,8 +130,9 @@ monorepo import sets the app's folder alone):
 
 The service that owns migrations also watches `/scripts/**`, where the
 migrations runner lives. The rows are a starting point: each app's resolved
-`@<slug>/*` dependencies decide, so update a row when they change. A missing
-package means its changes never deploy that app.
+`@<slug>/*` dependencies decide. When they change, update that service's
+watch paths in Railway and in `docs/setup.md`. A missing package means its
+changes never deploy that app.
 
 ## Variables
 
@@ -163,9 +163,14 @@ tests.
   workflow on the commit finishes, and a failed workflow skips the deploy. It
   only shows when the repo has a workflow on `push`, and it gives up after two
   hours. CI must never cancel a `main` run (`repo.md`), or that merge never
-  deploys.
-- **Migrations** run in the owning service's pre-deploy command, with the
-  service's variables and private network. A failure stops the deploy and the
+  deploys. A merge whose deploy Wait for CI skipped, or whose deploy failed,
+  isn't retried by a later merge outside that service's watch paths: once the
+  cause is fixed, deploy the latest commit by hand on each service it should
+  have reached (Deploy Latest Commit in Railway's command palette; Redeploy
+  rebuilds the old code).
+- **Migrations** run in the owning service's pre-deploy command (the root
+  `bun run db:migrate`, never filtered to the app), with the service's
+  variables and private network. A failure stops the deploy and the
   old version keeps serving. Migrations are additive (`data.md`).
 - **Rollback:** redeploy an earlier deployment in Railway. An applied
   migration stays applied, which is why they're additive.
