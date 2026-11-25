@@ -27,6 +27,10 @@ section exists. Every issue's criteria include the area doc and the
 `CONTEXT.md` terms it introduces. Risk is `high` for auth, billing, data,
 migrations and deletion; surfaces are `security` for those and `ui` for pages.
 
+A `ui` issue's Context names `Design/Brand` and, for each page, the screen it
+reuses (`Screens/<Name>`) or the new screen it adds (`ui.md`). A new screen's
+stories, one per state, are in its acceptance criteria.
+
 File in dependency order, so each `Depends on` points at an issue that exists.
 
 ## The catalogue

@@ -21,7 +21,7 @@ packages/
   observability/  Sentry, PostHog, scrubbing
   docs/           customer docs as Markdown (with web)
   start-kit/      TanStack Start plumbing shared by the apps
-  ui/             design system and Storybook
+  ui/             design system, screens and Storybook
   testing/        guards, fakes, factories
   typescript-config/
   sdk-typescript/ public client, a submodule of its own repository (if in scope)
