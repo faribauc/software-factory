@@ -61,9 +61,10 @@ wrapper library.
   route, with a value for each theme. The product rebrands with `--primary`,
   `--primary-foreground` and `--ring`.
 - **Fonts** are open fonts installed with Fontsource in this package
-  (`bun add @fontsource-variable/<font>`), imported at the top of
-  `globals.css` and set as `--font-sans` (and a heading font if the brand pairs
-  two). Never a Google Fonts or other CDN link.
+  (`bun add @fontsource-variable/<font>`, or `@fontsource/<font>` when there's
+  no variable build), imported at the top of `globals.css` and set as
+  `--font-sans` (and a heading font if the brand pairs two). Never a Google
+  Fonts or other CDN link.
 - `prefers-reduced-motion` turns animations off globally.
 
 ## Themes
@@ -71,23 +72,30 @@ wrapper library.
 Every product ships light and dark.
 
 - The theme follows the system preference until the user picks one with the
-  `ThemeToggle` in `AppShell`. The pick lives in a `theme` cookie (`light` or
-  `dark`; absent means system) set on the apex domain, so every app shares it.
-- Each app's root route runs a small inline script before first paint that
-  reads the cookie, else the system preference, and sets the `dark` class on
-  `<html>`. That holds for server-rendered, SPA and prerendered apps alike, so
-  no page flashes the wrong theme. A CSP that blocks inline scripts lists the
-  script's hash.
+  `ThemeToggle` in `AppShell`. The pick lives in a `theme` cookie: `light` or
+  `dark`, any other value counts as absent, and absent means system. It's a
+  preference written only when the user picks, so consent doesn't gate it. Set
+  it with `Path=/`, a one-year `Max-Age` and `SameSite=Lax`, plus `Secure` and
+  `Domain=<domain>` when the host is under the product's domain, so every app
+  shares it (no `Domain` on `localhost` or Railway's own hostnames).
+- A small inline script in the `<head>` of each app's HTML document, which SPA
+  and prerendered builds still emit, reads the cookie, else the system
+  preference, and only adds or removes the `dark` class on `<html>` before
+  first paint, so no page flashes the wrong theme. A CSP that blocks inline
+  scripts (`deploy-aws.md`) lists the script's hash.
+- A pick applies at once: the toggle sets the class and writes the cookie.
+  While no pick is stored, a listener follows system preference changes.
 - The marketing site has no toggle: it reads the same cookie and otherwise
   follows the system preference.
-- The cookie helpers and the inline script live in `packages/start-kit`;
-  `ThemeToggle` only takes the current value and an `onChange`.
-- Every story is checked in both themes, contrast included.
+- The cookie helpers and the inline script live in `packages/start-kit`.
+  `ThemeToggle` only takes the current value and an `onChange`; `AppShell`
+  takes `theme` and `onThemeChange` and passes them through.
+- Every story is checked with the Accessibility addon in each theme.
 
 ## Design phase
 
-The skeleton step of the `sf-saas` skill runs this when only the workspace
-root, the product config package and this package exist. It starts from `PRODUCT.md`: the brand
+The skeleton step of the `sf-saas` skill runs this first. It starts from
+`PRODUCT.md`: the brand
 personality, the references (products whose look the user likes), the
 anti-references, the design principles and the accessibility commitment.
 
@@ -95,16 +103,17 @@ anti-references, the design principles and the accessibility commitment.
    `Design/Directions/<Name>` story in `src/design/directions/` with its own
    token values scoped to a wrapper class. Each shows the colour tokens, the
    type scale, the logo and a few primitives (buttons, a card, an input), in
-   light and dark. The user picks one. Its values move into `globals.css`; the
-   direction stories, their CSS and the font packages only they used are
+   light and dark. Each direction imports its own fonts in its scoped CSS.
+   The user picks one. Its values and font imports move into `globals.css`;
+   the direction stories, their CSS and the font packages only they used are
    deleted.
 2. **Brand.** A `Design/Brand` story showing the live tokens of both themes,
    the type scale and the `Logo`. It stays as the reference for the tokens.
 3. **Key screens.** Two or three screens the plan needs, built as below: the
    signed-in shell around the product's home, one more kind of page from the
    plan (a list, a detail view or a settings form), and the marketing home when
-   the product has a site. Sign-in is the auth provider's hosted page, not a
-   screen. Add only the starter patterns those screens use.
+   the product has a site. Sign-in isn't a key screen: its UI is the auth
+   provider's (`auth.md`). Add only the starter patterns those screens use.
 
 **The logo** is the product name set in the brand font plus a simple geometric
 SVG mark, which is also the favicon. No illustrative logo.

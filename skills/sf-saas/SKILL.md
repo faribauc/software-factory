@@ -104,11 +104,12 @@ After approval, and only then:
 1. Create the GitHub repository, **private**, under the owner the user named,
    from the project folder: `gh repo create <owner>/<slug> --private
    --source . --remote origin`.
-2. Scaffold with the official CLIs (TanStack Start, shadcn, Storybook), never
-   hand-written boilerplate. Read the `tanstack-router`, `vite` and `workos`
-   skills first when installed.
-3. Run the **design phase** first: set up only the workspace root, the
-   product config package and `packages/ui` with Storybook (`ui.md`), start
+2. Every scaffold below uses the official CLIs (TanStack Start, shadcn,
+   Storybook), never hand-written boilerplate. Read the `tanstack-router`,
+   `vite` and `workos` skills first when installed.
+3. Run the **design phase** first: set up only the workspace root (Bun
+   workspaces, `typescript-config`), the product config package and
+   `packages/ui` with Storybook (`ui.md`), start
    Storybook on 6006 in the background, and give the user its URL. Follow the
    design phase in `ui.md`: show the two or three brand directions and have
    the user pick one, then show the brand and the key screens. Change them as
@@ -119,14 +120,13 @@ After approval, and only then:
    server as it lands, and keep them all running while you build the rest.
    Vite reloads code changes by itself. After a change it can't (dependencies,
    env, Vite or workspace config), restart that server and reload the page.
-5. Build the rest of the skeleton from `repo.md`: the monorepo layout, Bun
-   workspaces, Vite+ (`vp check`, `vp test`, `vp run`, with the `vite`
-   override TanStack Start needs), TypeScript, the product config package, the
-   env module and `.env.example`, `verify` and the git hooks, CI, the docs from
-   step 2 plus `AGENTS.md`, `CONTEXT.md`, `docs/README.md` and `docs:check`,
-   the test kit's guards (`testing.md`), the design system from the design
-   phase (`ui.md`), and `.railway/railway.ts` describing the services (not
-   applied).
+5. Build the rest of the skeleton from `repo.md`: the monorepo layout, Vite+
+   (`vp check`, `vp test`, `vp run`, with the `vite` override TanStack Start
+   needs), TypeScript, the env module and `.env.example`, `verify` and the git
+   hooks, CI, the docs from step 2 plus `AGENTS.md`, `CONTEXT.md`,
+   `docs/README.md` and `docs:check`, the test kit's guards (`testing.md`), the
+   theme script in each app's document head (`ui.md`), and
+   `.railway/railway.ts` describing the services (not applied).
 6. Run `verify` until it's green. Commit with short messages and push to
    `main`. Protect `main`: pull requests required and CI must pass.
 
@@ -146,10 +146,9 @@ must read; the builder reads them from this skill.
 
 Lead with the repository URL, the T3 project, the running dev servers' URLs
 and the approved design stories in Storybook (`Design/Brand` and the
-`Screens/*` stories). Then the decisions that
-differ from the user's defaults and why, the issues in order with links, the
-setup steps waiting for the user (accounts, keys, Railway, Turso, domain), and
-anything you couldn't verify.
+`Screens/*` stories). Then the decisions that differ from the user's defaults
+and why, the issues in order with links, the setup steps waiting for the user
+(accounts, keys, Railway, Turso, domain), and anything you couldn't verify.
 
 ## Rules every product keeps
 

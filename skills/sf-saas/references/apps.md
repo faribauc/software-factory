@@ -28,8 +28,8 @@ skills before wiring routes or config.
 - **Middleware order:** host allow-list, bootstrap, CSRF for server functions,
   auth, then translations.
 - The shared plumbing (bootstrap, session reading, `Result`, errors, safe
-  redirects, the host allow-list) lives in `packages/start-kit`, so every app
-  behaves the same.
+  redirects, the host allow-list, the theme script from `ui.md`) lives in
+  `packages/start-kit`, so every app behaves the same.
 
 ## Dashboard (`apps/dashboard`, port 3001)
 
