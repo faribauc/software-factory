@@ -83,11 +83,11 @@ the page as loaded (light, Playwright's default), switches the scheme with
 `page.emulateMedia({ colorScheme: "dark" })`, waits for `<html>` to carry the
 `dark` class, runs axe again, then switches back to light and waits for the
 class to go. A failure names the scheme it failed in. The config sets
-`reducedMotion: "reduce"`, so colour transitions finish at once and axe never
-reads a colour halfway between themes. The switch works because no test stores
-a theme pick, so the page follows the system preference (`ui.md`, "Themes"). A
-test that picks a theme with the toggle asserts the resulting class itself and
-doesn't call the helper after the pick.
+`reducedMotion: "reduce"`, which turns transitions off (`ui.md`, "Setup"), so
+axe never reads a colour halfway between themes. The switch works because a
+test starts with no theme pick stored, so the page follows the system
+preference (`ui.md`, "Themes"). A test that picks a theme with the toggle
+asserts the resulting class itself and doesn't call the helper after the pick.
 
 **Clerk products:** Clerk's hosted components can't be faked like WorkOS.
 Keep logic out of components, test the `signedIn` rule with the registry, and
