@@ -18,7 +18,13 @@ a recommendation wherever the answer isn't free text.
 3. Name, slug, apex domain, and the GitHub owner for the private repository.
 4. Languages the users read. More than one means translations (`apps.md`).
 
-**Round 2: the shape**
+**Round 2: the look**
+
+1. The brand personality, in a few words.
+2. One to three products whose look the user likes (references), and looks to
+   avoid (anti-references). The design phase (`ui.md`) starts from both.
+
+**Round 3: the shape**
 
 1. Does customers' code call a public API with API keys? *Yes* means WorkOS
    for auth (customers will want enterprise SSO) and the API module (`api.md`).
@@ -31,7 +37,7 @@ a recommendation wherever the answer isn't free text.
 3. Does an operator need an admin app to see or act on accounts?
 4. A marketing site with customer docs, or only the app behind sign-in?
 
-**Round 3: money**
+**Round 4: money**
 
 1. Does it charge, now or soon? Billing is always Polar (`billing.md`).
 2. The plans: names, prices, currencies, and what each allows (limits become
@@ -39,7 +45,7 @@ a recommendation wherever the answer isn't free text.
 3. Where the customers are, for the tax note in the decisions doc (Polar is the
    merchant of record, so it collects tax).
 
-**Round 4: accounts and legal**
+**Round 5: accounts and legal**
 
 1. How does an account end? *Delete now* for consumer products; *close, then
    purge after a retention period with win-back emails* for business products
@@ -49,7 +55,7 @@ a recommendation wherever the answer isn't free text.
    pages. Confirm.
 3. Who writes the legal copy. The skill writes placeholders marked as such.
 
-**Round 5: the stack**, only for rows below the answers put in doubt.
+**Round 6: the stack**, only for rows below the answers put in doubt.
 
 ## The stack table
 
@@ -78,7 +84,7 @@ otherwise state the default in the decisions doc and move on.
 | Billing | Polar | Clerk Billing; Stripe direct | Never by default: Clerk Billing has no tax handling, USD only, on/off features, no 3D Secure |
 | Email | Resend | Postmark; SES | Deliverability problems (Postmark), or already on AWS (SES) |
 | Observability | Sentry for errors, traces and cron monitors; PostHog for analytics and replay; one scrubber | PostHog only; Sentry only | Never by default |
-| Design system | `packages/ui`, Storybook-first, a story per component | `packages/ui` without Storybook; shadcn per app | Never by default |
+| Design system | `packages/ui`, Storybook-first, a story per component and per unique screen, light and dark | `packages/ui` without Storybook; shadcn per app | Never by default |
 | Translations | General Translation, generated at build | Paraglide; Lingui | The build can't call a paid service, or translations must be reviewed and committed |
 | Testing | The full kit, coverage gates included (`testing.md`) | No gates; lighter kit | Never by default |
 | Account ending | Asked: delete now or retention | Always one of them | Asked |

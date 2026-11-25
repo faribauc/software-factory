@@ -20,8 +20,8 @@ packages/
   email/          templates and the Resend transport
   observability/  Sentry, PostHog, scrubbing
   docs/           customer docs as Markdown (with web)
-  start-kit/      TanStack Start plumbing shared by the apps
-  ui/             design system and Storybook
+  start-kit/      TanStack Start plumbing and the theme script, shared by the apps
+  ui/             design system, screens and Storybook
   testing/        guards, fakes, factories
   typescript-config/
   sdk-typescript/ public client, a submodule of its own repository (if in scope)

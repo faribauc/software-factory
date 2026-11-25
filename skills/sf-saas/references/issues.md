@@ -27,6 +27,11 @@ section exists. Every issue's criteria include the area doc and the
 `CONTEXT.md` terms it introduces. Risk is `high` for auth, billing, data,
 migrations and deletion; surfaces are `security` for those and `ui` for pages.
 
+A `ui` issue lists `ui.md` among its references. Its Context names
+`Design/Brand` and, for each page with its own UI, the screen it reuses
+(`Screens/<Name>`) or the new screen it adds. A new screen's stories, one per
+state, are in its acceptance criteria.
+
 File in dependency order, so each `Depends on` points at an issue that exists.
 
 ## The catalogue
@@ -37,7 +42,7 @@ the skill) is already on `main`, so the first issue builds on it.
 | # | Issue | Module | Depends on | References |
 | --- | --- | --- | --- | --- |
 | 1 | Data layer: Drizzle schema for the tenant, membership and audit tables, migrations runner, `freshDb()`, tenant-first repositories | core | skeleton | `data.md`, `testing.md` |
-| 2 | Sign-in and the tenant boundary: provider wiring, provisioning (`ensureTenant` or `/welcome`), `customerCall`, the security registry test, auth pages, the fake auth provider | core | 1 | `auth.md`, `apps.md`, `testing.md` |
+| 2 | Sign-in and the tenant boundary: provider wiring, provisioning (`ensureTenant` or `/welcome`), `customerCall`, the security registry test, auth pages, the app shell with its theme toggle wired, the fake auth provider | core | 1 | `auth.md`, `apps.md`, `ui.md`, `testing.md` |
 | 3 | Teams: memberships, roles, invites, the `/team` page | teams | 2 | `auth.md` |
 | 4 | Observability: scrubber, Sentry and PostHog in apps and server, consent banner, event catalogue | core | 2 | `observability.md`, `ui.md` |
 | 5 | Email: templates, layout, log and Resend transports | core | 1 | `lifecycle.md` |
@@ -47,7 +52,7 @@ the skill) is already on `main`, so the first issue builds on it.
 | 9 | API keys and the pipeline: keys, `withApiKey`, gates, metering, quota emails, the keys page | API | 7, 8 | `api.md` |
 | 10 | Test environments: roles granted by plan, environment pages | API, environments | 9 | `api.md` |
 | 11 | Admin app: operator access, tenant list and detail, disable and enable, key revoke, audit timeline | admin | 2 (and 9 for keys) | `apps.md`, `auth.md` |
-| 12 | Marketing site and customer docs: prerendered site, docs package, SEO, 404 | site | skeleton | `apps.md` |
+| 12 | Marketing site and customer docs: prerendered site, docs package, SEO, 404 | site | skeleton | `apps.md`, `ui.md` |
 | 13 | `llms.txt`, `llms-full.txt` and Markdown twins | API, llms | 12 | `apps.md` |
 | 14 | MCP server: docs tools and product tools through the pipeline | API, MCP | 9, 12 | `api.md` |
 | 15 | TypeScript SDK: its own public repository as a submodule, golden fixtures, contract test, trusted publishing | API, SDK | 9 | `api.md` |

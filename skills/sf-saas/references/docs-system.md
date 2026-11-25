@@ -9,7 +9,7 @@ an area and keeps it true in the same change.
 | File | Holds |
 | --- | --- |
 | `AGENTS.md` (`CLAUDE.md` links to it) | What the repo is, a "where to look" table (area → doc → code), hard rules, how to keep docs current, agent workflow, the verify command, conventions |
-| `PRODUCT.md` | Register (brand or product), users, purpose, brand personality, anti-references, design principles, accessibility commitment |
+| `PRODUCT.md` | Register (brand or product), users, purpose, brand personality, references (products whose look the user likes), anti-references, design principles, accessibility commitment |
 | `CONTEXT.md` | The glossary: one entry per term, its definition and words to avoid. No rules here |
 | `docs/README.md` | Index of area docs and these conventions |
 | `docs/<area>.md` | One per area, from the template below |
