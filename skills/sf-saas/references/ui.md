@@ -65,7 +65,7 @@ wrapper library.
   no variable build), imported at the top of `globals.css` and set as
   `--font-sans` (and a heading font if the brand pairs two). Never a Google
   Fonts or other CDN link.
-- `prefers-reduced-motion` turns animations off globally.
+- `prefers-reduced-motion` turns animations and transitions off globally.
 
 ## Themes
 
@@ -88,11 +88,14 @@ Every product ships light and dark.
   system preference. While no pick is stored, a listener follows system
   preference changes.
 - The marketing site has no toggle: it reads the same cookie and otherwise
-  follows the system preference.
+  follows the system preference, with the same listener while no pick is
+  stored.
 - The cookie helpers and the inline script live in `packages/start-kit`.
   `ThemeToggle` only takes the current value and an `onChange`; `AppShell`
   takes `theme` and `onThemeChange` and passes them through.
-- Every story is checked with the Accessibility addon in each theme.
+- Every story is checked with the Accessibility addon in each theme, and the
+  end-to-end axe pass checks every visited page in both themes automatically
+  (`testing.md`, "End to end").
 
 ## Design phase
 
