@@ -60,7 +60,7 @@ the skill) is already on `main`, so the first issue builds on it.
 | 17 | Account ending, business: export, close and reopen | retention | 7 | `lifecycle.md` |
 | 18 | Retention job and purge: the cron script, claims, win-backs, final notice, purge, unsubscribe | retention | 17, 5 | `lifecycle.md`, `deploy-railway.md` |
 | 19 | Translations: General Translation wiring, language selector, account language, translated emails | i18n | 2, 5 | `apps.md`, `lifecycle.md` |
-| 20 | End-to-end suite: Playwright against built apps, provider mock server, axe, the flows built so far | core | 2 | `testing.md` |
+| 20 | End-to-end suite: Playwright against built apps, provider mock server, axe in light and dark, the flows built so far | core | 2 | `testing.md` |
 | 21 | Deploy: finish `.railway/railway.ts` for every service (built from the repo root), and in `docs/setup.md` each service's watch paths, the production checklist and the smoke steps | core | every issue above | `deploy-railway.md`, `docs-system.md` |
 
 Later issues extend the end-to-end suite with their own flows; issue 20 sets it

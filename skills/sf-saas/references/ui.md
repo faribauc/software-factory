@@ -88,11 +88,14 @@ Every product ships light and dark.
   system preference. While no pick is stored, a listener follows system
   preference changes.
 - The marketing site has no toggle: it reads the same cookie and otherwise
-  follows the system preference.
+  follows the system preference, with the same listener while no pick is
+  stored.
 - The cookie helpers and the inline script live in `packages/start-kit`.
   `ThemeToggle` only takes the current value and an `onChange`; `AppShell`
   takes `theme` and `onThemeChange` and passes them through.
-- Every story is checked with the Accessibility addon in each theme.
+- Every story is checked with the Accessibility addon in each theme, and the
+  end-to-end axe pass checks every visited page in both themes on its own
+  (`testing.md`, "End to end").
 
 ## Design phase
 

@@ -40,7 +40,7 @@ structural, not a convention. The kit is built before the first feature.
 | Components and stories | happy-dom, Testing Library, `composeStories` | The design system |
 | Security registry | source scan plus generated cases | Every server function guarded and validated; other tenants' ids get 404 |
 | End to end | Playwright against **built** apps | Real flows through fake providers |
-| Accessibility | `@axe-core/playwright` | No serious or critical WCAG 2.2 AA violation on any page the flows visit |
+| Accessibility | `@axe-core/playwright` | No serious or critical WCAG 2.2 AA violation on any page the flows visit, in light and dark |
 
 ## The kit (`packages/testing`)
 
@@ -76,6 +76,15 @@ tests.
 Each test starts signed out with fresh mocks and a new random user (an
 automatic fixture). A `signIn(page, path)` helper visits and accepts the terms
 when asked.
+
+**Accessibility in both themes.** Every visited page goes through one shared
+helper, `expectAccessible(page)`, never a bare axe call. It runs axe on the
+page as loaded (light, Playwright's default), switches the scheme with
+`page.emulateMedia({ colorScheme: "dark" })`, waits for `<html>` to carry the
+`dark` class, runs axe again, then switches back to light. A failure names the
+scheme it failed in. The switch works because no test stores a theme pick, so
+the page follows the system preference (`ui.md`, "Themes"). A test that picks a
+theme with the toggle asserts the resulting class itself instead.
 
 **Clerk products:** Clerk's hosted components can't be faked like WorkOS.
 Keep logic out of components, test the `signedIn` rule with the registry, and
