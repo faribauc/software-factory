@@ -76,15 +76,17 @@ Every product ships light and dark.
   `dark`, any other value counts as absent, and absent means system. It's a
   preference written only when the user picks, so consent doesn't gate it. Set
   it with `Path=/`, a one-year `Max-Age` and `SameSite=Lax`, plus `Secure` and
-  `Domain=<domain>` when the host is under the product's domain, so every app
-  shares it (no `Domain` on `localhost` or Railway's own hostnames).
+  `Domain=<apex domain>` when the host is under the product's domain, so every
+  app shares it (no `Domain` on `localhost` or Railway's own hostnames).
 - A small inline script in the `<head>` of each app's HTML document, which SPA
   and prerendered builds still emit, reads the cookie, else the system
   preference, and only adds or removes the `dark` class on `<html>` before
   first paint, so no page flashes the wrong theme. A CSP that blocks inline
-  scripts (`deploy-aws.md`) lists the script's hash.
+  scripts (`deploy-aws.md`) allows it by nonce or hash.
 - A pick applies at once: the toggle sets the class and writes the cookie.
-  While no pick is stored, a listener follows system preference changes.
+  Picking system deletes the cookie (same `Path` and `Domain`) and applies the
+  system preference. While no pick is stored, a listener follows system
+  preference changes.
 - The marketing site has no toggle: it reads the same cookie and otherwise
   follows the system preference.
 - The cookie helpers and the inline script live in `packages/start-kit`.
@@ -95,9 +97,9 @@ Every product ships light and dark.
 ## Design phase
 
 The skeleton step of the `sf-saas` skill runs this first. It starts from
-`PRODUCT.md`: the brand
-personality, the references (products whose look the user likes), the
-anti-references, the design principles and the accessibility commitment.
+`PRODUCT.md`: the brand personality, the references (products whose look the
+user likes), the anti-references, the design principles and the accessibility
+commitment.
 
 1. **Directions.** Two or three brand directions, each a
    `Design/Directions/<Name>` story in `src/design/directions/` with its own
@@ -105,8 +107,8 @@ anti-references, the design principles and the accessibility commitment.
    type scale, the logo and a few primitives (buttons, a card, an input), in
    light and dark. Each direction imports its own fonts in its scoped CSS.
    The user picks one. Its values and font imports move into `globals.css`;
-   the direction stories, their CSS and the font packages only they used are
-   deleted.
+   the direction stories, their CSS and the font packages only the unpicked
+   directions used are deleted.
 2. **Brand.** A `Design/Brand` story showing the live tokens of both themes,
    the type scale and the `Logo`. It stays as the reference for the tokens.
 3. **Key screens.** Two or three screens the plan needs, built as below: the

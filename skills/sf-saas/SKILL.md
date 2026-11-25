@@ -109,12 +109,11 @@ After approval, and only then:
    `vite` and `workos` skills first when installed.
 3. Run the **design phase** first: set up only the workspace root (Bun
    workspaces, `typescript-config`), the product config package and
-   `packages/ui` with Storybook (`ui.md`), start
-   Storybook on 6006 in the background, and give the user its URL. Follow the
-   design phase in `ui.md`: show the two or three brand directions and have
-   the user pick one, then show the brand and the key screens. Change them as
-   many times as asked, and get an explicit yes before scaffolding the apps or
-   building anything else.
+   `packages/ui` with Storybook (`ui.md`), start Storybook on 6006 in the
+   background, and give the user its URL. Follow the design phase in `ui.md`:
+   show the two or three brand directions and have the user pick one, then
+   show the brand and the key screens. Change them as many times as asked, and
+   get an explicit yes before scaffolding the apps or building anything else.
 4. Start the dev server the moment the first app scaffolds, in the background
    on its fixed port (`repo.md`), and give the user its URL. Start each app's
    server as it lands, and keep them all running while you build the rest.
@@ -125,8 +124,8 @@ After approval, and only then:
    needs), TypeScript, the env module and `.env.example`, `verify` and the git
    hooks, CI, the docs from step 2 plus `AGENTS.md`, `CONTEXT.md`,
    `docs/README.md` and `docs:check`, the test kit's guards (`testing.md`), the
-   theme script in each app's document head (`ui.md`), and
-   `.railway/railway.ts` describing the services (not applied).
+   theme script in each app's document head (`ui.md`), and `.railway/railway.ts`
+   describing the services (not applied).
 6. Run `verify` until it's green. Commit with short messages and push to
    `main`. Protect `main`: pull requests required and CI must pass.
 
