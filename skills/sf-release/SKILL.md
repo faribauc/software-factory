@@ -66,8 +66,9 @@ Pick each package's level from its biggest change:
 - **PATCH**: fixes, and any change users don't see.
 
 A `0.x` package bumps by the same levels: MAJOR takes `0.4.2` to `1.0.0`,
-MINOR to `0.5.0`, PATCH to `0.4.3`. A version or level the user asked for wins; point out
-when the changes suggest another. Packages with no changes keep their version.
+MINOR to `0.5.0`, PATCH to `0.4.3`. A version or level the user asked for wins;
+point out when the changes suggest another. Packages with no changes keep their
+version.
 
 **Apps and deployed services.** For an Expo app, the release also bumps iOS
 `buildNumber` and Android `versionCode` where the repo sets them by hand rather

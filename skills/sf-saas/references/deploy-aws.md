@@ -113,9 +113,9 @@ and pushing its release tag is what deploys it.
     image tag ECR already holds).
   - **The plan:** on a private repo, rulesets and environment rules need a
     paid GitHub plan, and a required approval before deploying needs
-    Enterprise. On GitHub Free, use no environment: each role trusts
-    `repo:<owner>/<repo>:ref:refs/tags/<app>-v*`, the variables live at
-    repository level, and anyone with write access can release.
+    Enterprise. On GitHub Free with a private repo, use no environment: each
+    role trusts `repo:<owner>/<repo>:ref:refs/tags/<app>-v*`, the variables
+    live at repository level, and anyone with write access can release.
   - **The subject format:** a repository created, renamed or transferred after
     2026-07-15 puts owner and repo ids in every subject
     (`repo:<owner>@<id>/<repo>@<id>:…`). Match the format the repo's tokens
