@@ -173,9 +173,10 @@ tests.
   variables and private network. A failure stops the deploy and the
   old version keeps serving. Migrations are additive (`data.md`).
 - **No release versions, on purpose:** a merge to `main` that passes CI is the
-  release. Apps stay `private` at `0.0.0`, nothing is tagged, and Sentry names
-  releases by commit (`observability.md`). Per-app versions start at `2.0.0`
-  with the move to AWS (`deploy-aws.md`).
+  release, deploying each service whose watch paths it touches. Apps stay
+  `private` at `0.0.0`, nothing is tagged, and Sentry names releases by commit
+  (`observability.md`). Per-app versions come with the move to AWS
+  (`deploy-aws.md`, "Releases").
 - **Rollback:** redeploy an earlier deployment in Railway. An applied
   migration stays applied, which is why they're additive.
 - **Previews (optional):** Railway PR environments create an environment per
