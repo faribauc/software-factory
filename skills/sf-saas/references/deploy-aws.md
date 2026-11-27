@@ -64,7 +64,7 @@ and pushing its release tag is what deploys it.
   (`api.md`).
 - **The first version:**
   - **On AWS from the start:** each app or stack keeps the skeleton's `0.0.0`,
-    and its first release bumps from there by `sf-release`'s `0.x` rule.
+    and its first release bumps from there by its level (`sf-release`).
   - **Moving from Railway:** each app or stack still at `0.0.0` starts at
     `2.0.0`. The pull request that adds the release workflows sets it in each
     `package.json` and in `bun.lock`. At cut-over, the `main` commit to deploy
@@ -96,10 +96,9 @@ and pushing its release tag is what deploys it.
   (1.7.12 rejects it).
 - **Who can release:**
   - **The tag rules** are two rulesets on `*-v*` and `*-v*/**` (`*` stops at
-    a `/`). One restricts creating
-    release tags, and only the releasers may bypass it. The other blocks
-    updating and deleting them, and nobody may bypass it. One ruleset with both
-    rules would let a releaser move tags too.
+    a `/`). One restricts creating release tags, and only the releasers may
+    bypass it. The other blocks updating and deleting them, and nobody may
+    bypass it. One ruleset with both rules would let a releaser move tags too.
   - **The `production` environment** accepts deployments only from `*-v*`
     tags, and holds the deploy variables.
   - **Each app's OIDC role** requires two claims:
@@ -110,7 +109,8 @@ and pushing its release tag is what deploys it.
   - **The checks catch mistakes, not a hostile releaser.** They run from the
     tagged commit's own workflow file, so anyone who may create a release tag
     can deploy, and anyone with write access can re-run an earlier release
-    run, which redeploys that version.
+    run, which may redeploy that version (it fails instead if it pushes an
+    image tag ECR already holds).
   - **The plan:** on a private repo, rulesets and environment rules need a
     paid GitHub plan, and a required approval before deploying needs
     Enterprise. On GitHub Free, use no environment: each role trusts
@@ -121,8 +121,8 @@ and pushing its release tag is what deploys it.
     (`repo:<owner>@<id>/<repo>@<id>:…`). Match the format the repo's tokens
     carry, or the role never matches.
 - **The owner's setup checklist** (`docs-system.md`) holds these steps, in this
-  order (on GitHub Free, skip the first two and set the variables at
-  repository level):
+  order (on GitHub Free with a private repo, skip the first two and set the
+  variables at repository level):
   1. the two rulesets (check: `gh api repos/<owner>/<repo>/rulesets/<id>` for
      each shows its rules, `active` enforcement and bypass list);
   2. the environment and its tag rule (check:

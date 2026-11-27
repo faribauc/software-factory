@@ -65,9 +65,8 @@ Pick each package's level from its biggest change:
   public API newly marked deprecated.
 - **PATCH**: fixes, and any change users don't see.
 
-A `0.x` package bumps the way its own earlier `0.x` releases did. If it has none
-to copy, breaking changes take the middle number and everything else the last,
-and the plan says so. A version or level the user asked for wins; point out
+A `0.x` package bumps by the same levels: MAJOR takes `0.4.2` to `1.0.0`,
+MINOR to `0.5.0`, PATCH to `0.4.3`. A version or level the user asked for wins; point out
 when the changes suggest another. Packages with no changes keep their version.
 
 **Apps and deployed services.** For an Expo app, the release also bumps iOS
