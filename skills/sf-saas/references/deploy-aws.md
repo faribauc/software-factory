@@ -50,11 +50,92 @@ or a Postgres container instead of `:memory:`.
   `nosniff`, `X-Frame-Options: DENY`, a strict referrer policy.
 - Alerts: an SNS topic to the alerts address; CloudFront 5xx over 5%, a
   task-down alarm per app, and a monthly budget at 80% and 100%.
-- Releases: `bun run release <app> <patch|minor|major>` bumps, commits and tags
-  `<app>-v<x.y.z>`; pushing the tag runs the release workflow in the GitHub
-  `production` environment, which checks the tag matches the version and is on
-  `main`, runs `verify`, assumes that app's OIDC role (trusted only for its own
-  tags) and deploys. Release tags are protected by a ruleset.
+## Releases
+
+On AWS nothing deploys on merge: each deployed app or stack has its own version,
+and pushing its release tag is what deploys it.
+
+- **What has a version:** each deployed app or stack holds a canonical SemVer
+  `MAJOR.MINOR.PATCH` in its own `package.json` (never `v1.4.0` or `01.4.0`),
+  with no prerelease or build part: a prerelease tag would still deploy to
+  production, and image tags can't hold a `+`. Apps stay `private` like
+  every workspace package. Internal packages (`ui`, `db`, `env`, `config`, …)
+  stay at `0.0.0` and are never tagged. The SDK releases from its own repo
+  (`api.md`).
+- **The first version:**
+  - **On AWS from the start:** each app or stack keeps the skeleton's `0.0.0`,
+    and its first release bumps from there by its level (`sf-release`).
+  - **Moving from Railway:** each app or stack still at `0.0.0` starts at
+    `2.0.0`. The pull request that adds the release workflows sets it in each
+    `package.json` and in `bun.lock`. At cut-over, the `main` commit to deploy
+    is tagged `<app>-v2.0.0` as is, with no release PR.
+  - **An app that already has a real version** keeps it, and releases from it
+    through `sf-release`.
+- **Tags:** `<app>-v<SemVer>`, one family per app. No app's `<app>-v` may
+  start another app's tag (`api` and `api-v2` collide), since a role matches
+  its prefix. A pushed tag is never moved, deleted or reused.
+- **Cutting a release** is the `sf-release` skill's job. The bump goes through
+  a release PR that changes only the app's `package.json` and `bun.lock`,
+  committed as `chore(<app>): release v<x.y.z>`. Merge it once its CI passes,
+  then tag the merged commit on `main` and push that tag by name.
+- **The release workflow:** one per app, on `push` of `<app>-v*` tags, in the
+  GitHub `production` environment. Before it asks for AWS credentials, it
+  checks out full history and:
+  1. runs the version check on `$GITHUB_REF_NAME`, which fails on a
+     non-canonical version (`<app>-vv1.2.3`, `<app>-v01.2.3`), another app's
+     tag, or a version that differs from the app's `package.json`;
+  2. fetches `main` and fails unless the tagged commit is on it
+     (`git merge-base --is-ancestor "$GITHUB_SHA" origin/main`).
+
+  It doesn't run `verify` again: CI ran it on the release PR. Then it assumes
+  the app's OIDC role and deploys. Workflows that deploy to the same ECS
+  cluster share one concurrency group with `cancel-in-progress: false`.
+  GitHub keeps only one pending run per group, so push the next app's tag once
+  the previous deploy has finished.
+  `lean:` one release at a time; add `queue: max` once actionlint accepts it
+  (1.7.12 rejects it).
+- **Who can release:**
+  - **The tag rules** are two rulesets on `*-v*` and `*-v*/**` (`*` stops at
+    a `/`). One restricts creating release tags, and only the releasers may
+    bypass it. The other blocks updating and deleting them, and nobody may
+    bypass it. One ruleset with both rules would let a releaser move tags too.
+  - **The `production` environment** accepts deployments only from `*-v*`
+    tags, and holds the deploy variables.
+  - **Each app's OIDC role** requires two claims:
+    - `sub` is `repo:<owner>/<repo>:environment:production`. A job that uses an
+      environment gets that subject, with no tag in it.
+    - `token.actions.githubusercontent.com:ref` matches
+      `refs/tags/<app>-v*`. This keeps each role to its own app's tags.
+  - **The checks catch mistakes, not a hostile releaser.** They run from the
+    tagged commit's own workflow file, so anyone who may create a release tag
+    can deploy, and anyone with write access can re-run an earlier release
+    run, which may redeploy that version (it fails instead if it pushes an
+    image tag ECR already holds).
+  - **The plan:** on a private repo, rulesets and environment rules need a
+    paid GitHub plan, and a required approval before deploying needs
+    Enterprise. On GitHub Free with a private repo, use no environment: each
+    role trusts `repo:<owner>/<repo>:ref:refs/tags/<app>-v*`, the variables
+    live at repository level, and anyone with write access can release.
+  - **The subject format:** a repository created, renamed or transferred after
+    2026-07-15 puts owner and repo ids in every subject
+    (`repo:<owner>@<id>/<repo>@<id>:…`). Match the format the repo's tokens
+    carry, or the role never matches.
+- **The owner's setup checklist** (`docs-system.md`) holds these steps, in this
+  order (on GitHub Free with a private repo, skip the first two and set the
+  variables at repository level):
+  1. the two rulesets (check: `gh api repos/<owner>/<repo>/rulesets/<id>` for
+     each shows its rules, `active` enforcement and bypass list);
+  2. the environment and its tag rule (check:
+     `gh api repos/<owner>/<repo>/environments/production/deployment-branch-policies`
+     lists `*-v*` of type `tag`);
+  3. the roles stack, deployed by hand the first time and whenever it changes,
+     since it can't deploy itself;
+  4. each role ARN as a variable.
+- **The version check** is a small script with a test: its map from app to
+  `package.json`, each rejected case above, and that every mapped
+  `package.json` holds a canonical version.
+- **The record:** the product's deploy doc has a table with one row per app:
+  tag, version file, workflow, role, and the deploy command.
 
 ## Cut-over
 
